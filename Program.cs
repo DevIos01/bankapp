@@ -1,3 +1,4 @@
+using System;
 namespace Bankapp;
 
 internal class Program
@@ -26,10 +27,10 @@ internal class Program
             switch (choice)
             {
                 case "1":
-                    // Login(allUsers);
+                    new User().Login(allUsers);
                     break;
                 case "2":
-                    // CreateAccount(allUsers);
+                    new User().CreateAccount(allUsers);
                     break;
                 case "0":
                     return;

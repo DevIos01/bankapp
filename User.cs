@@ -1,3 +1,4 @@
+using System;
 namespace Bankapp;
 
 public class User
@@ -43,7 +44,7 @@ public class User
         newUser.Phone = Ui.Ask("  Telefon:           ");
     }
 
-    public bool Login(List<User> allUsers)
+    public void Login(List<User> allUsers)
     {
         Ui.Header("LOGGA IN");
         Username = Ui.Ask("  Användarnamn: ");
@@ -54,11 +55,10 @@ public class User
         {
             Ui.Success($"  Välkommen {Username}!");
             Ui.Pause();
-            return true;
+            return;
         }
 
         Ui.Error("  Fel användarnamn eller lösenord.");
         Ui.Pause();
-        return false;
     }
 }
