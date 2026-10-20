@@ -4,6 +4,6 @@ internal class Program
 {
     static void Main(string[] args)
     {
-        List<User> ALLUser = new List<User>();
+        List<User> allUsers = new List<User>();
     }
 }
