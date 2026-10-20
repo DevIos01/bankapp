@@ -9,6 +9,8 @@ public class User
     public string Phone = "";
     public string Username = "";
     public string Password = "";
+    public int FailedLoginAttempts = 0;
+    public bool IsLocked = false;
     public List<Account> Accounts = new List<Account>();
 
     public void CreateAccount(List<User> allUsers)
