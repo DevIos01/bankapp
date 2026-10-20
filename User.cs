@@ -67,7 +67,7 @@ public class User
             return;
         }
 
-        if (allUsers.Any(u => u.Username == Username && u.Password == Password))
+        if (user != null && user.Password == Password)
         {
             //correct password resets count
             if(user != null)
