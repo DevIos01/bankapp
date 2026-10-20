@@ -32,6 +32,8 @@ public class User
 
         Kyc(newUser); //ny meny
         allUsers.Add(newUser);
+        // SPARAR ALLA ANVÄNDARE
+        UserStore.Save(allUsers);
         //--------skapa-konto-funktion som tar newUser.UserID--------
 
         Console.WriteLine();
@@ -71,6 +73,9 @@ public class User
             if(user != null)
             {
                 user.FailedLoginAttempts = 0;
+                // SPARAR NOLLSTÄLLNING
+                UserStore.Save(allUsers);
+
             }
             Ui.Success($"  Välkommen {Username}!");
             Ui.Pause();
@@ -81,10 +86,16 @@ public class User
         {
             user.FailedLoginAttempts++;
 
-            if (user.FailedLoginAttempts >= 3) 
+            if (user.FailedLoginAttempts >= 3)
             {
                 user.IsLocked = true;
-                Ui.Error(" Du har angivit fel lösenord, kontot är nu låst.");
+            }
+            // sparar räknare och låsning
+            UserStore.Save(allUsers);
+
+            if (user.IsLocked)
+            {
+                Ui.Error("  Du har angivit fel lösenord 3 gånger, kontot är nu låst.");
                 Ui.Pause();
                 return;
             }
