@@ -56,6 +56,14 @@ public class User
 
         User? user = allUsers.FirstOrDefault(u => u.Username == Username); //find useraccount with typed username
 
+        //controls if account is locked before checking password
+
+        if(user != null && user.IsLocked)
+        {
+            Ui.Error("Kontot är låst.");
+            Ui.Pause();
+            return;
+        }
 
         if (allUsers.Any(u => u.Username == Username && u.Password == Password))
         {
