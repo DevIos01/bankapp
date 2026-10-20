@@ -12,36 +12,53 @@ public class User
 
     public void CreateAccount(List<User> allUsers)
     {
-        //  Console.WriteLine("Ange unikt användarnamn.");
-        User newUser = new User(); //Skapa konto 
-        newUser.Username = "user";
-        newUser.Password = "1234";
-        if (allUsers.Any(u => u.Username == "user"))
+        User newUser = new User(); //Skapa konto
+
+        Ui.Header("SKAPA KONTO", "Steg 1 av 2");
+        newUser.Username = Ui.Ask("  Användarnamn: ");
+        newUser.Password = Ui.Ask("  Lösenord:     ");
+
+        if (allUsers.Any(u => u.Username == newUser.Username))
         {
-            Console.WriteLine("Ange unikt användarnamn");
+            Console.WriteLine();
+            Ui.Error("  Användarnamnet är upptaget, välj ett annat.");
+            Ui.Pause();
             return;
         }
+
         Kyc(newUser); //ny meny
         allUsers.Add(newUser);
         //--------skapa-konto-funktion som tar newUser.UserID--------
-        Console.WriteLine("Konton har skapats.");
 
+        Console.WriteLine();
+        Ui.Success("  Kontot har skapats!");
+        Ui.Pause();
     }
 
     public void Kyc(User newUser)
     {
-        newUser.FullName = "";
-        newUser.Email = "";
-        newUser.Phone = "";
+        Ui.Header("DINA UPPGIFTER", "Steg 2 av 2");
+        newUser.FullName = Ui.Ask("  Fullständigt namn: ");
+        newUser.Email = Ui.Ask("  E-post:            ");
+        newUser.Phone = Ui.Ask("  Telefon:           ");
     }
 
     public bool Login(List<User> allUsers)
     {
+        Ui.Header("LOGGA IN");
+        Username = Ui.Ask("  Användarnamn: ");
+        Password = Ui.Ask("  Lösenord:     ");
+        Console.WriteLine();
+
         if (allUsers.Any(u => u.Username == Username && u.Password == Password))
         {
+            Ui.Success($"  Välkommen {Username}!");
+            Ui.Pause();
             return true;
         }
 
+        Ui.Error("  Fel användarnamn eller lösenord.");
+        Ui.Pause();
         return false;
     }
 }
