@@ -67,12 +67,30 @@ public class User
 
         if (allUsers.Any(u => u.Username == Username && u.Password == Password))
         {
+            //correct password resets count
+            if(user != null)
+            {
+                user.FailedLoginAttempts = 0;
+            }
             Ui.Success($"  Välkommen {Username}!");
             Ui.Pause();
             return;
         }
+        //if username exist but password is incorrect. Give 3 attempts before locking account  
+        if(user != null)
+        {
+            user.FailedLoginAttempts++;
 
+            if (user.FailedLoginAttempts >= 3) 
+            {
+                user.IsLocked = true;
+                Ui.Error(" Du har angivit fel lösenord, kontot är nu låst.");
+                Ui.Pause();
+                return;
+            }
+        }
         Ui.Error("  Fel användarnamn eller lösenord.");
         Ui.Pause();
+
     }
 }
