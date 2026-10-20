@@ -16,21 +16,19 @@ public class User
         User newUser = new User(); //Skapa konto 
         newUser.Username = "user";
         newUser.Password = "1234";
-        if (allUsers.Any(u => u.Username == "1234"))
-
-
+        if (allUsers.Any(u => u.Username == "user"))
         {
             Console.WriteLine("Ange unikt användarnamn");
             return;
         }
-        Kyc(newUser, allUsers); //ny meny
+        Kyc(newUser); //ny meny
         allUsers.Add(newUser);
         //--------skapa-konto-funktion som tar newUser.UserID--------
         Console.WriteLine("Konton har skapats.");
 
     }
 
-    public void Kyc(User newUser, List<User> allUsers)
+    public void Kyc(User newUser)
     {
         newUser.FullName = "";
         newUser.Email = "";
