@@ -9,4 +9,41 @@ public class User
     public string Username = "";
     public string Password = "";
     public List<Account> Accounts = new List<Account>();
+
+    public void CreateAccount(List<User> allUsers)
+    {
+        //  Console.WriteLine("Ange unikt användarnamn.");
+        User newUser = new User(); //Skapa konto 
+        newUser.Username = "user";
+        newUser.Password = "1234";
+        if (allUsers.Any(u => u.Username == "1234"))
+
+
+        {
+            Console.WriteLine("Ange unikt användarnamn");
+            return;
+        }
+        Kyc(newUser, allUsers); //ny meny
+        allUsers.Add(newUser);
+        //--------skapa-konto-funktion som tar newUser.UserID--------
+        Console.WriteLine("Konton har skapats.");
+
+    }
+
+    public void Kyc(User newUser, List<User> allUsers)
+    {
+        newUser.FullName = "";
+        newUser.Email = "";
+        newUser.Phone = "";
+    }
+
+    public bool Login(List<User> allUsers)
+    {
+        if (allUsers.Any(u => u.Username == Username && u.Password == Password))
+        {
+            return true;
+        }
+
+        return false;
+    }
 }
