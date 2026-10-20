@@ -21,6 +21,7 @@ public class User
         newUser.Username = Ui.Ask("  Användarnamn: ");
         newUser.Password = Ui.Ask("  Lösenord:     ");
 
+
         if (allUsers.Any(u => u.Username == newUser.Username))
         {
             Console.WriteLine();
@@ -52,6 +53,9 @@ public class User
         Username = Ui.Ask("  Användarnamn: ");
         Password = Ui.Ask("  Lösenord:     ");
         Console.WriteLine();
+
+        User? user = allUsers.FirstOrDefault(u => u.Username == Username); //find useraccount with typed username
+
 
         if (allUsers.Any(u => u.Username == Username && u.Password == Password))
         {
