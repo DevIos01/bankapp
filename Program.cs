@@ -52,7 +52,7 @@ internal class Program
                     if (loggedInUser != null &&
                         loggedInUser.Role == UserRole.Admin)
                     {
-                        //AdminMenu.Show(allUsers);
+                        AdminMenu.Show(allUsers);
                     }
 
                     break;
