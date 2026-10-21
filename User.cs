@@ -29,7 +29,7 @@ public class User
             }
         }
     }
-}
+
 
     public void CreateAccount(List<User> allUsers)
     {
