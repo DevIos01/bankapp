@@ -76,7 +76,7 @@ public class User
         newUser.Phone = Ui.Ask("  Telefon:           ");
     }
 
-    public void Login(List<User> allUsers)
+    public User? Login(List<User> allUsers)
     {
         Ui.Header("LOGGA IN");
         Username = Ui.Ask("  Användarnamn: ");
@@ -91,7 +91,7 @@ public class User
         {
             Ui.Error("Kontot är låst.");
             Ui.Pause();
-            return;
+            return null;
         }
 
         if (user != null && user.Password == Password)
@@ -105,10 +105,11 @@ public class User
             
             Ui.Success($"  Välkommen {Username}!");
             Ui.Pause();
-            return;
+            return user;
         }
+
         //if username exist but password is incorrect. Give 3 attempts before locking account  
-        if(user != null)
+        if (user != null)
         {
             user.FailedLoginAttempts++;
 
@@ -119,11 +120,12 @@ public class User
             {
                 Ui.Error("  Du har angivit fel lösenord 3 gånger, kontot är nu låst.");
                 Ui.Pause();
-                return;
+                return null;
             }
         }
         Ui.Error("  Fel användarnamn eller lösenord.");
         Ui.Pause();
+        return null;
 
     }
 }

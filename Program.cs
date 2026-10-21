@@ -20,7 +20,8 @@ internal class Program
 
         allUsers.Add(admin);
         UserStore.Save(allUsers);
-    }
+    }        // Creates default admin user
+
     static void Main(string[] args)
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
@@ -58,6 +59,6 @@ internal class Program
                     break;
             }
         }
-       
-    }
+        
+        }
 }
