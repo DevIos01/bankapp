@@ -35,7 +35,7 @@ public static class AdminMenu
                     break;
             }
         }
-    }
+    } // admin menu
 
     static void CreateUser(List<User> allUsers)
     {
@@ -83,7 +83,7 @@ public static class AdminMenu
         UserStore.Save(allUsers);
 
         Ui.Success("Användaren har skapats.");
-    }
+    } //create user with user-type
     static void UnlockUser(List<User> allUsers)
     {
         List<User> lockedUsers =
@@ -116,5 +116,5 @@ public static class AdminMenu
 
         UserStore.Save(allUsers);
         Ui.Success($"{selectedUser.Username} har låsts upp.");
-    }
+    } //unlock locked users 
 }

@@ -14,7 +14,7 @@ public class User
     public string Phone = "";
     public string Username = "";
     public string Password = "";
-    public UserRole Role = UserRole.Customer;
+    public UserRole Role = UserRole.Customer; //default role 
     public int FailedLoginAttempts = 0;
     public bool IsLocked => FailedLoginAttempts >= 3;
     
