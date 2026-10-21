@@ -25,7 +25,7 @@ public class User
             int rowNumber = 1;
             foreach (var account in Accounts)
             {
-                Console.WriteLine($"{rowNumber++} - Konto : {account.AccountNumber} | Saldo : {account.Balance} {account.Currency} "); 
+                Console.WriteLine($"{rowNumber++} - Konto : {account.AccountNumber} | Saldo : {account.Balance:N2} {account.Currency} "); 
             }
         }
     }
