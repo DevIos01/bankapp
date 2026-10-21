@@ -39,7 +39,7 @@ public static class AdminMenu
 
     static void CreateUser(List<User> allUsers)
     {
-        Console.Write("Användarnamn: ");
+        Console.Write(" ");
         string username = Ui.Ask("Användarnamn: ");
         if (allUsers.Any(user => user.Username == username))
         {
@@ -47,8 +47,8 @@ public static class AdminMenu
             return;
         }
 
-        Console.Write("Lösenord: ");
-        string password = Ui.Ask("Lösenord");
+        Console.Write(" ");
+        string password = Ui.Ask("Lösenord: ");
 
         Console.WriteLine("[1] Kund");
         Console.WriteLine("[2] Admin");
