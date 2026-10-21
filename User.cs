@@ -10,7 +10,7 @@ public class User
     public string Username = "";
     public string Password = "";
     public int FailedLoginAttempts = 0;
-    public bool IsLocked = false;
+    public bool IsLocked => FailedLoginAttempts >= 3;
     public List<Account> Accounts = new List<Account>();
 
     public void CreateAccount(List<User> allUsers)
