@@ -6,7 +6,7 @@ internal class Program
     static void Main(string[] args)
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
-        List<User> allUsers = new List<User>();
+        List<User> allUsers = UserStore.Load();
         StartMenu(allUsers);
     }
 

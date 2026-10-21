@@ -9,6 +9,8 @@ public class User
     public string Phone = "";
     public string Username = "";
     public string Password = "";
+    public int FailedLoginAttempts = 0;
+    public bool IsLocked => FailedLoginAttempts >= 3;
     public List<Account> Accounts = new List<Account>();
 
 
@@ -39,6 +41,7 @@ public class User
         newUser.Username = Ui.Ask("  Användarnamn: ");
         newUser.Password = Ui.Ask("  Lösenord:     ");
 
+
         if (allUsers.Any(u => u.Username == newUser.Username))
         {
             Console.WriteLine();
@@ -49,6 +52,8 @@ public class User
 
         Kyc(newUser); //ny meny
         allUsers.Add(newUser);
+        // SPARAR ALLA ANVÄNDARE
+        UserStore.Save(allUsers);
         //--------skapa-konto-funktion som tar newUser.UserID--------
 
         Console.WriteLine();
@@ -71,15 +76,48 @@ public class User
         Password = Ui.Ask("  Lösenord:     ");
         Console.WriteLine();
 
-        if (allUsers.Any(u => u.Username == Username && u.Password == Password))
+        User? user = allUsers.FirstOrDefault(u => u.Username == Username); //find useraccount with typed username
+
+        //controls if account is locked before checking password
+
+        if(user != null && user.IsLocked)
         {
-            Ui.Success($"  Välkommen {Username}!");
+            Ui.Error("Kontot är låst.");
             Ui.Pause();
             return;
         }
 
+        if (user != null && user.Password == Password)
+        {
+            //correct password resets count
+            
+                user.FailedLoginAttempts = 0;
+                // SPARAR NOLLSTÄLLNING
+                UserStore.Save(allUsers);
+
+            
+            Ui.Success($"  Välkommen {Username}!");
+            Ui.Pause();
+            return;
+        }
+        //if username exist but password is incorrect. Give 3 attempts before locking account  
+        if(user != null)
+        {
+            user.FailedLoginAttempts++;
+
+            // sparar räknare och låsning
+            UserStore.Save(allUsers);
+
+            if (user.IsLocked)
+            {
+                Ui.Error("  Du har angivit fel lösenord 3 gånger, kontot är nu låst.");
+                Ui.Pause();
+                return;
+            }
+        }
         Ui.Error("  Fel användarnamn eller lösenord.");
         Ui.Pause();
+
     }
 }
 
