@@ -47,7 +47,14 @@ internal class Program
             switch (choice)
             {
                 case "1":
-                    new User().Login(allUsers);
+                    User? loggedInUser = new User().Login(allUsers);
+
+                    if (loggedInUser != null &&
+                        loggedInUser.Role == UserRole.Admin)
+                    {
+                        //AdminMenu.Show(allUsers);
+                    }
+
                     break;
                 case "2":
                     new User().CreateAccount(allUsers);
