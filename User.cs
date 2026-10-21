@@ -1,6 +1,11 @@
 using System;
 namespace Bankapp;
 
+public enum UserRole //Admin customer
+{
+    Customer,
+    Admin
+}
 public class User
 {
     public string FullName = "";
@@ -9,8 +14,10 @@ public class User
     public string Phone = "";
     public string Username = "";
     public string Password = "";
+    public UserRole Role = UserRole.Customer;
     public int FailedLoginAttempts = 0;
     public bool IsLocked => FailedLoginAttempts >= 3;
+    
     public List<Account> Accounts = new List<Account>();
 
 

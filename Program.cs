@@ -3,10 +3,29 @@ namespace Bankapp;
 
 internal class Program
 {
+    static void EnsureDefaultAdmin(List<User> allUsers)
+    {
+        // Creates default admin user
+        if (allUsers.Any(user => user.Username == "admin"))
+        {
+            return;
+        }
+
+        User admin = new User
+        {
+            Username = "admin",
+            Password = "admin",
+            Role = UserRole.Admin
+        };
+
+        allUsers.Add(admin);
+        UserStore.Save(allUsers);
+    }
     static void Main(string[] args)
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         List<User> allUsers = UserStore.Load();
+        EnsureDefaultAdmin(allUsers);
         StartMenu(allUsers);
     }
 
@@ -39,5 +58,6 @@ internal class Program
                     break;
             }
         }
+       
     }
 }
