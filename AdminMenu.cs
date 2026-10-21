@@ -84,6 +84,37 @@ public static class AdminMenu
 
         Ui.Success("Användaren har skapats.");
     }
-    
+    static void UnlockUser(List<User> allUsers)
+    {
+        List<User> lockedUsers =
+            allUsers.Where(user => user.IsLocked).ToList();
+
+        if (lockedUsers.Count == 0)
+        {
+            Console.WriteLine("Det finns inga låsta användare.");
+            return;
+        }
+
+        for (int i = 0; i < lockedUsers.Count; i++)
+        {
+            Console.WriteLine($"[{i + 1}] {lockedUsers[i].Username}");
+        }
+
+        Console.Write("Välj användare : ");
+        string? input = Console.ReadLine();
+
+        if (!int.TryParse(input, out int selection) ||
+            selection < 1 ||
+            selection > lockedUsers.Count)
+        {
+            Ui.Error("Ogiltigt val.");
+            return;
+        }
+
+        User selectedUser = lockedUsers[selection - 1];
+        selectedUser.FailedLoginAttempts = 0;
+
+        UserStore.Save(allUsers);
+        Ui.Success($"{selectedUser.Username} har låsts upp.");
     }
 }
