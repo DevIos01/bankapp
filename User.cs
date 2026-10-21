@@ -70,13 +70,12 @@ public class User
         if (user != null && user.Password == Password)
         {
             //correct password resets count
-            if(user != null)
-            {
+            
                 user.FailedLoginAttempts = 0;
                 // SPARAR NOLLSTÄLLNING
                 UserStore.Save(allUsers);
 
-            }
+            
             Ui.Success($"  Välkommen {Username}!");
             Ui.Pause();
             return;
@@ -86,10 +85,6 @@ public class User
         {
             user.FailedLoginAttempts++;
 
-            if (user.FailedLoginAttempts >= 3)
-            {
-                user.IsLocked = true;
-            }
             // sparar räknare och låsning
             UserStore.Save(allUsers);
 
