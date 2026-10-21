@@ -40,8 +40,7 @@ public static class AdminMenu
     static void CreateUser(List<User> allUsers)
     {
         Console.Write("Användarnamn: ");
-        string username = Console.ReadLine() ?? "";
-
+        string username = Ui.Ask("Användarnamn: ");
         if (allUsers.Any(user => user.Username == username))
         {
             Ui.Error("Användarnamnet är upptaget.");
@@ -49,7 +48,7 @@ public static class AdminMenu
         }
 
         Console.Write("Lösenord: ");
-        string password = Console.ReadLine() ?? "";
+        string password = Ui.Ask("Lösenord");
 
         Console.WriteLine("[1] Kund");
         Console.WriteLine("[2] Admin");
