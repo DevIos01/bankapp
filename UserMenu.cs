@@ -25,20 +25,22 @@ namespace Bankapp
                     case "1":
                         Console.WriteLine($"Nuvarande uppgifter: {loggedInUser.FullName}");
                         loggedInUser.FullName = Ui.Ask("Nytt namn: ");
+                        UserStore.Save(allUser);
 
                         break;
                     case "2":
                         Console.WriteLine($"Nuvarande uppgifter: {loggedInUser.Email}");
                         loggedInUser.Email = Ui.Ask("Ny Epost: ");
+                        UserStore.Save(allUser);
 
                         break;
                     case "3":
                         Console.WriteLine($"Nuvarande uppgifter: {loggedInUser.FullName}");
                         loggedInUser.Phone = Ui.Ask("Nytt mobilnummer: ");
+                        UserStore.Save(allUser);
+
                         break;
                     case "0":
-                        
-
                         return;
                     default:
                         Ui.Error("Fel val, försök igen.");
