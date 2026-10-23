@@ -3,10 +3,30 @@ namespace Bankapp;
 
 internal class Program
 {
+    static void EnsureDefaultAdmin(List<User> allUsers)
+    {
+        // Creates default admin user
+        if (allUsers.Any(user => user.Username == "admin"))
+        {
+            return;
+        }
+
+        User admin = new User
+        {
+            Username = "admin",
+            Password = "admin",
+            Role = UserRole.Admin
+        };
+
+        allUsers.Add(admin);
+        UserStore.Save(allUsers);
+    }        // Creates default admin user
+
     static void Main(string[] args)
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         List<User> allUsers = UserStore.Load();
+        EnsureDefaultAdmin(allUsers);
         StartMenu(allUsers);
     }
 
@@ -27,8 +47,25 @@ internal class Program
             switch (choice)
             {
                 case "1":
-                    new User().Login(allUsers);
+                    User? loggedInUser = new User().Login(allUsers);
+
+                    if (loggedInUser != null &&
+                        loggedInUser.Role == UserRole.Admin)
+                    {
+                        AdminMenu.Show(allUsers);
+                    }
+                    
+                    else if (loggedInUser != null)
+                    {
+                        UserMenu.EditKyc(loggedInUser, allUsers);
+                    }
+                    else
+                    {
+                        Ui.Error("Inloggningen misslyckades. Försök igen.");
+                    }
+
                     break;
+
                 case "2":
                     new User().CreateAccount(allUsers);
                     break;
@@ -39,5 +76,7 @@ internal class Program
                     break;
             }
         }
-    }
+
+        
+        }
 }

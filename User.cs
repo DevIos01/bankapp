@@ -1,6 +1,11 @@
 using System;
 namespace Bankapp;
 
+public enum UserRole //Admin customer
+{
+    Customer,
+    Admin
+}
 public class User
 {
     public string FullName = "";
@@ -9,8 +14,10 @@ public class User
     public string Phone = "";
     public string Username = "";
     public string Password = "";
+    public UserRole Role = UserRole.Customer; //default role 
     public int FailedLoginAttempts = 0;
     public bool IsLocked => FailedLoginAttempts >= 3;
+    
     public List<Account> Accounts = new List<Account>();
 
 
@@ -65,11 +72,16 @@ public class User
     {
         Ui.Header("DINA UPPGIFTER", "Steg 2 av 2");
         newUser.FullName = Ui.Ask("  Fullständigt namn: ");
-        newUser.Email = Ui.Ask("  E-post:            ");
-        newUser.Phone = Ui.Ask("  Telefon:           ");
+        string email = Ui.Ask("  E-post: ");
+        while (!email.Contains('@'))
+        {
+            Ui.Error("E-postadressen måste innehålla @.");
+            email = Ui.Ask("  E-post: ");
+        }
+        newUser.Email = email; newUser.Phone = Ui.Ask("  Telefon:           ");
     }
 
-    public void Login(List<User> allUsers)
+    public User? Login(List<User> allUsers)
     {
         Ui.Header("LOGGA IN");
         Username = Ui.Ask("  Användarnamn: ");
@@ -84,7 +96,7 @@ public class User
         {
             Ui.Error("Kontot är låst.");
             Ui.Pause();
-            return;
+            return null;
         }
 
         if (user != null && user.Password == Password)
@@ -98,10 +110,11 @@ public class User
             
             Ui.Success($"  Välkommen {Username}!");
             Ui.Pause();
-            return;
+            return user;
         }
+
         //if username exist but password is incorrect. Give 3 attempts before locking account  
-        if(user != null)
+        if (user != null)
         {
             user.FailedLoginAttempts++;
 
@@ -112,11 +125,12 @@ public class User
             {
                 Ui.Error("  Du har angivit fel lösenord 3 gånger, kontot är nu låst.");
                 Ui.Pause();
-                return;
+                return null;
             }
         }
         Ui.Error("  Fel användarnamn eller lösenord.");
         Ui.Pause();
+        return null;
 
     }
 }
