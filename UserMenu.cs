@@ -35,7 +35,7 @@ namespace Bankapp
 
                         break;
                     case "3":
-                        Console.WriteLine($"Nuvarande uppgifter: {loggedInUser.FullName}");
+                        Console.WriteLine($"Nuvarande uppgifter: {loggedInUser.Phone}");
                         loggedInUser.Phone = Ui.Ask("Nytt mobilnummer: ");
                         UserStore.Save(allUser);
 
