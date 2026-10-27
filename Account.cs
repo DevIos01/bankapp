@@ -1,4 +1,9 @@
+using System.Text.Json.Serialization;
+
 namespace Bankapp;
+
+[JsonDerivedType(typeof(Account), "normal")]
+[JsonDerivedType(typeof(SavingsAccount), "savings")]
 public class Account
 {
     public long AccountNumber;
@@ -29,10 +34,41 @@ public class Account
         }
 
         newAccount.AccountNumber = CreateAccountNumber();
+        newAccount.UserID = owner.UserID;
         ChooseCurrency(newAccount);
 
         owner.Accounts.Add(newAccount);
     }
+
+    public void OpenSavingsAccount(User owner)
+    {
+        SavingsAccount newAccount = new SavingsAccount();
+
+        Console.WriteLine("Sparkonto med 3% årlig ränta");
+        Console.WriteLine("10 000 kr med 3% = 300 kr årligen");
+
+        Console.Write("Namn på sparkonto - ");
+
+        while (true)
+        {
+            string? userInput = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(userInput) || int.TryParse(userInput, out int number))
+            {
+                Console.WriteLine("Namn kan inte vara en siffra.");
+                continue;
+            }
+            else
+            {
+                newAccount.AccountName = userInput;
+                break;
+            }
+        }
+
+        newAccount.AccountNumber = CreateAccountNumber();
+        newAccount.UserID = owner.UserID;
+        owner.Accounts.Add(newAccount);
+    }
+
     public void ChooseCurrency(Account newAccount)
     {
         Console.WriteLine("Vilken valuta vill du använda?\n");
