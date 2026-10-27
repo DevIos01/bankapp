@@ -54,8 +54,13 @@ internal class Program
                     {
                         AdminMenu.Show(allUsers);
                     }
+                    else if (loggedInUser != null)
+                    {
+                        UserMenu.EditKyc(loggedInUser, allUsers);
+                    }
 
                     break;
+
                 case "2":
                     new User().CreateAccount(allUsers);
                     break;

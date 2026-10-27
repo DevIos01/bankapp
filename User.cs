@@ -72,7 +72,13 @@ public class User
     {
         Ui.Header("DINA UPPGIFTER", "Steg 2 av 2");
         newUser.FullName = Ui.Ask("  Fullständigt namn: ");
-        newUser.Email = Ui.Ask("  E-post:            ");
+        string email = Ui.Ask("  E-post:            ");
+        while (!email.Contains('@'))
+        {
+            Ui.Error("  E-postadressen måste innehålla @.");
+            email = Ui.Ask("  E-post:            ");
+        }
+        newUser.Email = email;
         newUser.Phone = Ui.Ask("  Telefon:           ");
     }
 
