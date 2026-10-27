@@ -54,14 +54,9 @@ internal class Program
                     {
                         AdminMenu.Show(allUsers);
                     }
-                    
                     else if (loggedInUser != null)
                     {
                         UserMenu.EditKyc(loggedInUser, allUsers);
-                    }
-                    else
-                    {
-                        Ui.Error("Inloggningen misslyckades. Försök igen.");
                     }
 
                     break;
