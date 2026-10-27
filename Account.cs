@@ -34,6 +34,7 @@ public class Account
         }
 
         newAccount.AccountNumber = CreateAccountNumber();
+        newAccount.UserID = owner.UserID;
         ChooseCurrency(newAccount);
 
         owner.Accounts.Add(newAccount);
@@ -64,6 +65,7 @@ public class Account
         }
 
         newAccount.AccountNumber = CreateAccountNumber();
+        newAccount.UserID = owner.UserID;
         owner.Accounts.Add(newAccount);
     }
 
