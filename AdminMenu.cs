@@ -11,7 +11,7 @@ public static class AdminMenu
         while (true)
         {
             Console.WriteLine("[1] Skapa användare");
-            Console.WriteLine("[2] Visa låsta användare ");
+            Console.WriteLine("[2] Lås upp användare");
             Console.WriteLine("[0] Logga ut");
             Console.Write("Val: ");
 
