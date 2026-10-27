@@ -15,7 +15,7 @@ namespace Bankapp
                 Console.WriteLine("  [2] Ändra Epost");
                 Console.WriteLine("  [3] Ändra Mobilnummer");
 
-                Console.WriteLine("  [0] Avsluta");
+                Console.WriteLine("  [0] Logga ut");
                 Console.WriteLine("──────────────────────────────");
                 Console.Write("Val: ");
                 string? choice = Console.ReadLine();
