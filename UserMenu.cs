@@ -30,11 +30,11 @@ namespace Bankapp
                         break;
                     case "2":
                         Console.WriteLine($"Nuvarande uppgifter: {loggedInUser.Email}");
-                        string email = Ui.Ask("Ny  E-post: ");
+                        string email = Ui.Ask("Ny e-post: ");
                         while (!email.Contains('@'))
                         {
                             Ui.Error("E-postadressen måste innehålla @.");
-                            email = Ui.Ask("  E-post: ");
+                            email = Ui.Ask("Ny e-post: ");
                         }
                         loggedInUser.Email = email; 
                         UserStore.Save(allUser);
