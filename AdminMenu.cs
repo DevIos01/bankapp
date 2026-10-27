@@ -46,7 +46,6 @@ public static class AdminMenu
             return;
         }
 
-        Console.Write(" ");
         string password = Ui.Ask("Lösenord: ");
 
         Console.WriteLine("[1] Kund");
