@@ -109,7 +109,7 @@ public class User
         }
 
         //if username exist but password is incorrect. Give 3 attempts before locking account  
-        if (user != null)
+        if (user != null && user.Role != UserRole.Admin)
         {
             user.FailedLoginAttempts++;
 
