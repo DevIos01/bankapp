@@ -11,7 +11,7 @@ public static class AdminMenu
         while (true)
         {
             Console.WriteLine("[1] Skapa användare");
-            Console.WriteLine("[2] Visa låsta användare ");
+            Console.WriteLine("[2] Lås upp användare");
             Console.WriteLine("[0] Logga ut");
             Console.Write("Val: ");
 
@@ -39,7 +39,6 @@ public static class AdminMenu
 
     static void CreateUser(List<User> allUsers)
     {
-        Console.Write(" ");
         string username = Ui.Ask("Användarnamn: ");
         if (allUsers.Any(user => user.Username == username))
         {
@@ -47,7 +46,6 @@ public static class AdminMenu
             return;
         }
 
-        Console.Write(" ");
         string password = Ui.Ask("Lösenord: ");
 
         Console.WriteLine("[1] Kund");

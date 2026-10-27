@@ -72,13 +72,14 @@ public class User
     {
         Ui.Header("DINA UPPGIFTER", "Steg 2 av 2");
         newUser.FullName = Ui.Ask("  Fullständigt namn: ");
-        string email = Ui.Ask("  E-post: ");
+        string email = Ui.Ask("  E-post:            ");
         while (!email.Contains('@'))
         {
-            Ui.Error("E-postadressen måste innehålla @.");
-            email = Ui.Ask("  E-post: ");
+            Ui.Error("  E-postadressen måste innehålla @.");
+            email = Ui.Ask("  E-post:            ");
         }
-        newUser.Email = email; newUser.Phone = Ui.Ask("  Telefon:           ");
+        newUser.Email = email;
+        newUser.Phone = Ui.Ask("  Telefon:           ");
     }
 
     public User? Login(List<User> allUsers)
@@ -114,7 +115,7 @@ public class User
         }
 
         //if username exist but password is incorrect. Give 3 attempts before locking account  
-        if (user != null)
+        if (user != null && user.Role != UserRole.Admin)
         {
             user.FailedLoginAttempts++;
 
