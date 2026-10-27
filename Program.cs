@@ -66,6 +66,5 @@ internal class Program
                     break;
             }
         }
-        
-        }
+    }
 }
