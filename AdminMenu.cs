@@ -39,7 +39,6 @@ public static class AdminMenu
 
     static void CreateUser(List<User> allUsers)
     {
-        Console.Write(" ");
         string username = Ui.Ask("Användarnamn: ");
         if (allUsers.Any(user => user.Username == username))
         {
