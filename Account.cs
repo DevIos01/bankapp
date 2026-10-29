@@ -16,14 +16,14 @@ public class Account
     {
         Account newAccount = new Account();
 
-        Console.Write("Namn på konto - ");
+        Ui.Header("NYTT KONTO");
 
         while (true)
         {
-            string? userInput = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(userInput) || int.TryParse(userInput, out int number))
+            string userInput = Ui.Ask("  Namn på konto: ");
+            if (int.TryParse(userInput, out int number))
             {
-                Console.WriteLine("Namn kan inte vara en siffra.");
+                Ui.Error("Namn kan inte vara en siffra.");
                 continue;
             }
             else
@@ -38,23 +38,26 @@ public class Account
         ChooseCurrency(newAccount);
 
         owner.Accounts.Add(newAccount);
+
+        Console.WriteLine();
+        Ui.Success($"Kontot {newAccount.AccountName} har öppnats.");
+        Ui.Pause();
     }
 
     public void OpenSavingsAccount(User owner)
     {
         SavingsAccount newAccount = new SavingsAccount();
 
-        Console.WriteLine("Sparkonto med 3% årlig ränta");
-        Console.WriteLine("10 000 kr med 3% = 300 kr årligen");
-
-        Console.Write("Namn på sparkonto - ");
+        Ui.Header("NYTT SPARKONTO", "3% årlig ränta");
+        Console.WriteLine($"  Exempel: 10 000 kr ger {newAccount.YearlyInterest(10000):N0} kr i ränta per år.");
+        Console.WriteLine();
 
         while (true)
         {
-            string? userInput = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(userInput) || int.TryParse(userInput, out int number))
+            string userInput = Ui.Ask("  Namn på sparkonto: ");
+            if (int.TryParse(userInput, out int number))
             {
-                Console.WriteLine("Namn kan inte vara en siffra.");
+                Ui.Error("Namn kan inte vara en siffra.");
                 continue;
             }
             else
@@ -67,33 +70,35 @@ public class Account
         newAccount.AccountNumber = CreateAccountNumber();
         newAccount.UserID = owner.UserID;
         owner.Accounts.Add(newAccount);
+
+        Console.WriteLine();
+        Ui.Success($"Sparkontot {newAccount.AccountName} har öppnats.");
+        Ui.Pause();
     }
 
     public void ChooseCurrency(Account newAccount)
     {
-        Console.WriteLine("Vilken valuta vill du använda?\n");
-        Console.WriteLine("1. SEK");
-        Console.WriteLine("2. EUR");
-        Console.WriteLine("3. USD");
-            while (true)
-            {
-                string? userInput = Console.ReadLine();
-                switch (userInput)
-                {
-                    case "1":
-                        newAccount.Currency = Bankapp.CurrencyType.Sek;
-                        return;
-                    case "2":
-                        newAccount.Currency = Bankapp.CurrencyType.Eur;
-                        return;
-                    case "3":
-                        newAccount.Currency = Bankapp.CurrencyType.Usd;
-                        return;
-                    default:
-                        Console.WriteLine("Ogiltigt tal / Försök igen");
-                        break;
-                }
-            }
+        Console.WriteLine();
+        Console.WriteLine("  Vilken valuta vill du använda?");
+        Ui.Option("1", "SEK");
+        Ui.Option("2", "EUR");
+        Ui.Option("3", "USD");
+        Console.WriteLine();
+
+        int choice = Ui.AskNumber("  Val: ", 1, 3);
+
+        switch (choice)
+        {
+            case 1:
+                newAccount.Currency = Bankapp.CurrencyType.Sek;
+                break;
+            case 2:
+                newAccount.Currency = Bankapp.CurrencyType.Eur;
+                break;
+            case 3:
+                newAccount.Currency = Bankapp.CurrencyType.Usd;
+                break;
+        }
     }
     public long CreateAccountNumber()
     {

@@ -7,49 +7,47 @@ namespace Bankapp
     public static class UserMenu
     {
         public static void EditKyc(User loggedInUser, List<User> allUser)
-            {
+        {
             while (true)
             {
-                Console.WriteLine("──────────────────────────────");
-                Console.WriteLine("  [1] Ändra Namn");
-                Console.WriteLine("  [2] Ändra Epost");
-                Console.WriteLine("  [3] Ändra Mobilnummer");
-
-                Console.WriteLine("  [0] Logga ut");
-                Console.WriteLine("──────────────────────────────");
-                Console.Write("Val: ");
-                string? choice = Console.ReadLine();
+                Ui.Header("MINA SIDOR", $"Inloggad som {loggedInUser.Username}");
+                Ui.Option("1", "Ändra namn");
+                Ui.Option("2", "Ändra e-post");
+                Ui.Option("3", "Ändra telefon");
+                Ui.Option("0", "Logga ut");
+                string choice = Ui.Choice();
 
                 switch (choice)
                 {
                     case "1":
-                        Console.WriteLine($"Nuvarande uppgifter: {loggedInUser.FullName}");
-                        loggedInUser.FullName = Ui.Ask("Nytt namn: ");
+                        Console.WriteLine();
+                        Console.WriteLine($"  Nuvarande: {loggedInUser.FullName}");
+                        loggedInUser.FullName = Ui.Ask("  Nytt namn: ");
                         UserStore.Save(allUser);
-
+                        Ui.Success("Sparat!");
+                        Ui.Pause();
                         break;
                     case "2":
-                        Console.WriteLine($"Nuvarande uppgifter: {loggedInUser.Email}");
-                        string email = Ui.Ask("Ny e-post: ");
-                        while (!email.Contains('@'))
-                        {
-                            Ui.Error("E-postadressen måste innehålla @.");
-                            email = Ui.Ask("Ny e-post: ");
-                        }
-                        loggedInUser.Email = email; 
+                        Console.WriteLine();
+                        Console.WriteLine($"  Nuvarande: {loggedInUser.Email}");
+                        loggedInUser.Email = Ui.AskEmail("  Ny e-post: ");
                         UserStore.Save(allUser);
-
+                        Ui.Success("Sparat!");
+                        Ui.Pause();
                         break;
                     case "3":
-                        Console.WriteLine($"Nuvarande uppgifter: {loggedInUser.Phone}");
-                        loggedInUser.Phone = Ui.Ask("Nytt mobilnummer: ");
+                        Console.WriteLine();
+                        Console.WriteLine($"  Nuvarande: {loggedInUser.Phone}");
+                        loggedInUser.Phone = Ui.Ask("  Ny telefon: ");
                         UserStore.Save(allUser);
-
+                        Ui.Success("Sparat!");
+                        Ui.Pause();
                         break;
                     case "0":
                         return;
                     default:
                         Ui.Error("Fel val, försök igen.");
+                        Ui.Pause();
                         break;
 
                 }

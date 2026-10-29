@@ -32,17 +32,16 @@ internal class Program
 
     static void StartMenu(List<User> allUsers)
     {
-        Ui.Logo();
-
         while (true)
         {
-            Console.WriteLine("──────────────────────────────");
-            Console.WriteLine("  [1] Logga in");
-            Console.WriteLine("  [2] Skapa konto");
-            Console.WriteLine("  [0] Avsluta");
-            Console.WriteLine("──────────────────────────────");
-            Console.Write("Val: ");
-            string? choice = Console.ReadLine();
+            // clear and draw the logo every time, so it's back after login/logout
+            Ui.Clear();
+            Ui.Logo();
+            Console.WriteLine();
+            Ui.Option("1", "Logga in");
+            Ui.Option("2", "Skapa konto");
+            Ui.Option("0", "Avsluta");
+            string choice = Ui.Choice();
 
             switch (choice)
             {
@@ -68,6 +67,7 @@ internal class Program
                     return;
                 default:
                     Ui.Error("Fel val, försök igen.");
+                    Ui.Pause();
                     break;
             }
         }
