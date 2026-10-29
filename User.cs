@@ -60,10 +60,18 @@ public class User
         }
 
         Kyc(newUser); //ny meny
+        Account personkonto = new Account
+        {
+            AccountName = "Personkonto",
+            AccountNumber = new Account().CreateAccountNumber(),
+            UserID = newUser.UserID,
+            Currency = CurrencyType.Sek
+        };
+
+        newUser.Accounts.Add(personkonto);
         allUsers.Add(newUser);
         // SPARAR ALLA ANVÄNDARE
         UserStore.Save(allUsers);
-        //--------skapa-konto-funktion som tar newUser.UserID--------
 
         Console.WriteLine();
         Ui.Success("  Kontot har skapats!");

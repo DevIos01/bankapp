@@ -73,6 +73,20 @@ public static class AdminMenu
             Role = role
         };
 
+        // customers get a personkonto, same as when they sign up themselves
+        if (role == UserRole.Customer)
+        {
+            Account personkonto = new Account
+            {
+                AccountName = "Personkonto",
+                AccountNumber = new Account().CreateAccountNumber(),
+                UserID = newUser.UserID,
+                Currency = CurrencyType.Sek
+            };
+
+            newUser.Accounts.Add(personkonto);
+        }
+
         allUsers.Add(newUser);
         UserStore.Save(allUsers);
 

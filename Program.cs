@@ -55,7 +55,7 @@ internal class Program
                     }
                     else if (loggedInUser != null)
                     {
-                        UserMenu.EditKyc(loggedInUser, allUsers);
+                        UserMenu.MainMenu(loggedInUser, allUsers);
                     }
 
                     break;
