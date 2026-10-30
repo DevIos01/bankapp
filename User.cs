@@ -23,18 +23,20 @@ public class User
 
     public void DisplayAccountInfo()
     {
-        Console.WriteLine($"{FullName} bankkonton är :\n");
+        Console.WriteLine("  Dina konton:");
+        Console.WriteLine();
 
         if (Accounts.Count == 0)
         {
-            Console.WriteLine("Du har inga konton!");
+            Console.WriteLine("  Du har inga konton ännu.");
         }
         else
         {
             int rowNumber = 1;
             foreach (var account in Accounts)
             {
-                Console.WriteLine($"{rowNumber++} - Konto : {account.AccountNumber} | Saldo : {account.Balance:N2} {account.Currency} "); 
+                // name, number and balance in lined-up columns, e.g. "1. Lönekonto  123456789  5 000,00 SEK"
+                Console.WriteLine($"  {rowNumber++}. {account.AccountName,-15} {account.AccountNumber,-10} {account.Balance,12:N2} {account.Currency.ToString().ToUpper()}");
             }
         }
     }
@@ -46,7 +48,7 @@ public class User
 
         Ui.Header("SKAPA KONTO", "Steg 1 av 2");
         newUser.Username = Ui.Ask("  Användarnamn: ");
-        newUser.Password = Ui.Ask("  Lösenord:     ");
+        newUser.Password = Ui.AskPassword("  Lösenord:     ");
 
 
         if (allUsers.Any(u => u.Username == newUser.Username))
@@ -58,10 +60,18 @@ public class User
         }
 
         Kyc(newUser); //ny meny
+        Account personkonto = new Account
+        {
+            AccountName = "Personkonto",
+            AccountNumber = new Account().CreateAccountNumber(),
+            UserID = newUser.UserID,
+            Currency = CurrencyType.Sek
+        };
+
+        newUser.Accounts.Add(personkonto);
         allUsers.Add(newUser);
         // SPARAR ALLA ANVÄNDARE
         UserStore.Save(allUsers);
-        //--------skapa-konto-funktion som tar newUser.UserID--------
 
         Console.WriteLine();
         Ui.Success("  Kontot har skapats!");
@@ -72,13 +82,7 @@ public class User
     {
         Ui.Header("DINA UPPGIFTER", "Steg 2 av 2");
         newUser.FullName = Ui.Ask("  Fullständigt namn: ");
-        string email = Ui.Ask("  E-post:            ");
-        while (!email.Contains('@'))
-        {
-            Ui.Error("  E-postadressen måste innehålla @.");
-            email = Ui.Ask("  E-post:            ");
-        }
-        newUser.Email = email;
+        newUser.Email = Ui.AskEmail("  E-post:            ");
         newUser.Phone = Ui.Ask("  Telefon:           ");
     }
 
@@ -86,7 +90,7 @@ public class User
     {
         Ui.Header("LOGGA IN");
         Username = Ui.Ask("  Användarnamn: ");
-        Password = Ui.Ask("  Lösenord:     ");
+        Password = Ui.AskPassword("  Lösenord:     ");
         Console.WriteLine();
 
         User? user = allUsers.FirstOrDefault(u => u.Username == Username); //find useraccount with typed username
