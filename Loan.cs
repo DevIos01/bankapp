@@ -17,4 +17,10 @@ public class Loan
 
     public decimal TotalCost =>
         LoanAmount + InterestCost;
+
+    
+public static void ApplyForLoan()
+    {
+
+    }
 }
