@@ -24,12 +24,9 @@ public static class TransactionService
         Account destination,
         decimal amount)
     {
-        bool success = user.Accounts.Contains(destination) && amount > 0;
+        bool success = user.Accounts.Contains(destination) && destination.Deposit(amount);
 
-        if (success)
-            destination.Credit(amount);
-
-        user.Transactions.Add(new Transaction
+        destination.AddTransaction(new Transaction
         {
             Type = "Insättning",
             From = "Extern insättning",
