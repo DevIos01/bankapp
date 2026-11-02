@@ -375,14 +375,7 @@ namespace Bankapp
             if (account is null)
                 return;
 
-            user.Transactions ??= new List<Transaction>();
-
-            List<Transaction> transactions = user.Transactions
-                .Where(t =>
-                    t.FromAccountNumber == account.AccountNumber ||
-                    t.ToAccountNumber == account.AccountNumber)
-                .OrderByDescending(t => t.Timestamp)
-                .ToList();
+            List<Transaction> transactions = account.GetTransactionLog();
 
             Console.WriteLine();
             Console.WriteLine(
