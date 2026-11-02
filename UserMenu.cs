@@ -263,13 +263,13 @@ namespace Bankapp
                 for (int i = 0; i < user.Accounts.Count; i++)
                 {
                     Account account = user.Accounts[i];
-                    Console.WriteLine(
-                        $"  [{i + 1}] {account.AccountName} — " +
-                        $"{account.AccountNumber} — {account.Balance:N2} " +
-                        $"{account.Currency.ToString().ToUpper()}");
+                    Ui.Option(
+                        $"{i + 1}",
+                        $"{account.AccountName} — {account.AccountNumber} — " +
+                        $"{account.Balance:N2} {account.Currency.ToString().ToUpper()}");
                 }
 
-                Console.WriteLine("  [0] Avbryt och gå tillbaka till BANKKONTON");
+                Ui.Option("0", "Avbryt och gå tillbaka till BANKKONTON");
                 string input = Ui.Ask(prompt);
 
                 if (input == "0")
