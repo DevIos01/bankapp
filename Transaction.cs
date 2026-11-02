@@ -58,11 +58,11 @@ public static class TransactionService
 
         if (success)
         {
-            source.Debit(amount);
-            destination.Credit(amount);
+            source.Withdraw(amount);
+            destination.Deposit(amount);
         }
 
-        user.Transactions.Add(new Transaction
+        Transaction transaction = new Transaction
         {
             Type = "Överföring",
             From = $"{source.AccountName} ({source.AccountNumber})",
@@ -71,7 +71,12 @@ public static class TransactionService
             ToAccountNumber = destination.AccountNumber,
             Amount = amount,
             Status = success ? "Genomförd" : "Misslyckad"
-        });
+        };
+
+        source.AddTransaction(transaction);
+
+        if (destination != source)
+            destination.AddTransaction(transaction);
 
         UserStore.Save(allUsers);
         return success;
