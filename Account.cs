@@ -118,7 +118,7 @@ public class Account
         while (true)
         {
             string input = Ui.Ask(
-                $"{prompt.TrimEnd()} (0 = avbryt): ");
+                $"{prompt.TrimEnd().TrimEnd(':')} (0 = avbryt): ");
 
             if (input == "0")
                 return null;
