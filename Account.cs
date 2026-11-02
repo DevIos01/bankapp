@@ -12,99 +12,129 @@ public class Account
     public decimal Balance { get; private set; }
     public Guid UserID;
 
-    public void OpenNewAccount(User owner)
+    internal void Credit(decimal amount)
     {
-        Account newAccount = new Account();
+        Balance += amount;
+    }
 
+    internal void Debit(decimal amount)
+    {
+        Balance -= amount;
+    }
+
+    public bool OpenNewAccount(User owner)
+    {
         Ui.Header("NYTT KONTO");
 
-        while (true)
-        {
-            string userInput = Ui.Ask("  Namn på konto: ");
-            if (int.TryParse(userInput, out int number))
-            {
-                Ui.Error("Namn kan inte vara en siffra.");
-                continue;
-            }
-            else
-            {
-                newAccount.AccountName = userInput;
-                break;
-            }
-        }
+        string? accountName = AskAccountName("  Namn på konto: ");
+        if (accountName is null)
+            return false;
 
-        newAccount.AccountNumber = CreateAccountNumber();
-        newAccount.UserID = owner.UserID;
-        ChooseCurrency(newAccount);
+        Account newAccount = new Account
+        {
+            AccountName = accountName,
+            AccountNumber = CreateAccountNumber(),
+            UserID = owner.UserID
+        };
+
+        if (!ChooseCurrency(newAccount))
+            return false;
 
         owner.Accounts.Add(newAccount);
 
         Console.WriteLine();
         Ui.Success($"Kontot {newAccount.AccountName} har öppnats.");
         Ui.Pause();
+        return true;
     }
 
-    public void OpenSavingsAccount(User owner)
+    public bool OpenSavingsAccount(User owner)
     {
         SavingsAccount newAccount = new SavingsAccount();
 
         Ui.Header("NYTT SPARKONTO", "3% årlig ränta");
-        Console.WriteLine($"  Exempel: 10 000 kr ger {newAccount.YearlyInterest(10000):N0} kr i ränta per år.");
+        Console.WriteLine(
+            $"  Exempel: 10 000 kr ger {newAccount.YearlyInterest(10000):N0} kr i ränta per år.");
         Console.WriteLine();
+        Console.WriteLine("  Skriv 0 när som helst för att avbryta.");
 
-        while (true)
-        {
-            string userInput = Ui.Ask("  Namn på sparkonto: ");
-            if (int.TryParse(userInput, out int number))
-            {
-                Ui.Error("Namn kan inte vara en siffra.");
-                continue;
-            }
-            else
-            {
-                newAccount.AccountName = userInput;
-                break;
-            }
-        }
+        string? accountName = AskAccountName("  Namn på sparkonto: ");
+        if (accountName is null)
+            return false;
 
+        newAccount.AccountName = accountName;
         newAccount.AccountNumber = CreateAccountNumber();
         newAccount.UserID = owner.UserID;
+
         owner.Accounts.Add(newAccount);
 
         Console.WriteLine();
         Ui.Success($"Sparkontot {newAccount.AccountName} har öppnats.");
         Ui.Pause();
+        return true;
     }
 
-    public void ChooseCurrency(Account newAccount)
+    public bool ChooseCurrency(Account newAccount)
     {
-        Console.WriteLine();
-        Console.WriteLine("  Vilken valuta vill du använda?");
-        Ui.Option("1", "SEK");
-        Ui.Option("2", "EUR");
-        Ui.Option("3", "USD");
-        Console.WriteLine();
-
-        int choice = Ui.AskNumber("  Val: ", 1, 3);
-
-        switch (choice)
+        while (true)
         {
-            case 1:
-                newAccount.Currency = Bankapp.CurrencyType.Sek;
-                break;
-            case 2:
-                newAccount.Currency = Bankapp.CurrencyType.Eur;
-                break;
-            case 3:
-                newAccount.Currency = Bankapp.CurrencyType.Usd;
-                break;
+            Console.WriteLine();
+            Console.WriteLine("  Vilken valuta vill du använda?");
+            Ui.Option("1", "SEK");
+            Ui.Option("2", "EUR");
+            Ui.Option("3", "USD");
+            Ui.Option("0", "Avbryt och gå tillbaka till BANKKONTON");
+            Console.WriteLine();
+
+            string choice = Ui.Ask("  Val: ");
+
+            switch (choice)
+            {
+                case "1":
+                    newAccount.Currency = CurrencyType.Sek;
+                    return true;
+
+                case "2":
+                    newAccount.Currency = CurrencyType.Eur;
+                    return true;
+
+                case "3":
+                    newAccount.Currency = CurrencyType.Usd;
+                    return true;
+
+                case "0":
+                    return false;
+
+                default:
+                    Ui.Error("Välj 1, 2, 3 eller 0 för att avbryta.");
+                    break;
+            }
         }
     }
+
+    private static string? AskAccountName(string prompt)
+    {
+        while (true)
+        {
+            string input = Ui.Ask(
+                $"{prompt.TrimEnd()} (0 = avbryt): ");
+
+            if (input == "0")
+                return null;
+
+            if (int.TryParse(input, out _))
+            {
+                Ui.Error("Namn kan inte vara en siffra.");
+                continue;
+            }
+
+            return input;
+        }
+    }
+
     public long CreateAccountNumber()
     {
         Random rnd = new Random();
-        long AccountNumber = rnd.Next(999999999);
-
-        return AccountNumber;
+        return rnd.Next(999999999);
     }
 }

@@ -17,9 +17,9 @@ public class User
     public UserRole Role = UserRole.Customer; //default role 
     public int FailedLoginAttempts = 0;
     public bool IsLocked => FailedLoginAttempts >= 3;
-    
-    public List<Account> Accounts = new List<Account>();
 
+    public List<Account> Accounts = new List<Account>();
+    public List<Transaction> Transactions = new List<Transaction>(); //NY 
 
     public void DisplayAccountInfo()
     {
