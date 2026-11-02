@@ -12,7 +12,7 @@ public class Loan
     public int LoanDurationYears { get; set; }
     public long PayoutAccountNumber { get; set; }
 
-    public decimal InterestCost =>
+    public decimal InterestCost => 
         LoanAmount * AnnualInterestRate * LoanDurationYears;
 
     public decimal TotalCost =>
@@ -106,14 +106,14 @@ public class Loan
         };
 
         loggedInUser.Loans.Add(loan);
-        payoutAccount.Deposit(loanAmount);
+      //  payoutAccount.Deposit(loanAmount); // Se över funktion
         UserStore.Save(allUsers);
 
         Ui.Success("Lånet har betalats ut till ditt konto.");
         Ui.Pause();
     }
 
-    public static void ShowLoans(User loggedInUser)
+    public static void ShowLoans(User loggedInUser) //show loan amount, interest, duration and  total cost
     {
         Console.Clear();
         Console.WriteLine("=== Mina lån ===");

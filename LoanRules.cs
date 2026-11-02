@@ -2,12 +2,12 @@
 
 public static class LoanRules
 {
-    // Adminens standardränta, 4 %
+    //  minimum interest 4 %
     public static decimal DefaultRate { get; set; } = 0.04m;
 
     public static decimal GetMaxLoanAmount(decimal accountBalance)
     {
-        return accountBalance * 2m;
+        return accountBalance * 2m; // accountbalance x 2 = max loan
     }
 
     public static decimal GetAnnualInterestRate(
