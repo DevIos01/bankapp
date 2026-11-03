@@ -9,123 +9,147 @@ public class Account
     public long AccountNumber;
     public string AccountName = "";
     public CurrencyType Currency = CurrencyType.Sek;
-    public decimal Balance { get;  set; }
+    [JsonInclude]
+    public decimal Balance { get; private set; }
     public Guid UserID;
 
-    public bool Withdraw(decimal amount)
-    {
-        if (amount <= 0)
-        {
-            return false;
-        }
-        else if (Balance < amount)
-        {
-            return false;
-        }
-        else
-        {
-            Balance -= amount;
-            return true;
-        }
-    }
+    public List<Transaction> Transactions = new List<Transaction>();
     public bool Deposit(decimal amount)
     {
-        if (amount > 0)
-        {
-            Balance += amount;
-            return true;
-        }
-        return false;
+        if (amount <= 0)
+            return false;
+        Balance += amount;
+        return true;
+    }
+    public bool Withdraw(decimal amount)
+    {
+        if (amount <= 0 || amount > Balance)
+            return false;
+        Balance -= amount;
+        return true;
+    }
+    public void AddTransaction(Transaction transaction)
+    {
+        Transactions.Add(transaction);
+    }
+    public List<Transaction> GetTransactionLog()
+    {
+        return Transactions.OrderByDescending(t => t.Timestamp).ToList();
     }
 
-    public void OpenNewAccount(User owner)
+    public bool OpenNewAccount(User owner)
     {
-        Account newAccount = new Account();
+        Ui.Header("NYTT KONTO");
 
-        Console.Write("Namn på konto - ");
+        string? accountName = AskAccountName("  Namn på konto: ");
+        if (accountName is null)
+            return false;
 
-        while (true)
+        Account newAccount = new Account
         {
-            string? userInput = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(userInput) || int.TryParse(userInput, out int number))
-            {
-                Console.WriteLine("Namn kan inte vara en siffra.");
-                continue;
-            }
-            else
-            {
-                newAccount.AccountName = userInput;
-                break;
-            }
-        }
+            AccountName = accountName,
+            AccountNumber = CreateAccountNumber(),
+            UserID = owner.UserID
+        };
 
-        newAccount.AccountNumber = CreateAccountNumber();
-        newAccount.UserID = owner.UserID;
-        ChooseCurrency(newAccount);
+        if (!ChooseCurrency(newAccount))
+            return false;
 
         owner.Accounts.Add(newAccount);
+
+        Console.WriteLine();
+        Ui.Success($"Kontot {newAccount.AccountName} har öppnats.");
+        Ui.Pause();
+        return true;
     }
 
-    public void OpenSavingsAccount(User owner)
+    public bool OpenSavingsAccount(User owner)
     {
         SavingsAccount newAccount = new SavingsAccount();
 
-        Console.WriteLine("Sparkonto med 3% årlig ränta");
-        Console.WriteLine("10 000 kr med 3% = 300 kr årligen");
+        Ui.Header("NYTT SPARKONTO", "3% årlig ränta");
+        Console.WriteLine(
+            $"  Exempel: 10 000 kr ger {newAccount.YearlyInterest(10000):N0} kr i ränta per år.");
+        Console.WriteLine();
+        Console.WriteLine("  Skriv 0 när som helst för att avbryta.");
 
-        Console.Write("Namn på sparkonto - ");
+        string? accountName = AskAccountName("  Namn på sparkonto: ");
+        if (accountName is null)
+            return false;
 
-        while (true)
-        {
-            string? userInput = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(userInput) || int.TryParse(userInput, out int number))
-            {
-                Console.WriteLine("Namn kan inte vara en siffra.");
-                continue;
-            }
-            else
-            {
-                newAccount.AccountName = userInput;
-                break;
-            }
-        }
-
+        newAccount.AccountName = accountName;
         newAccount.AccountNumber = CreateAccountNumber();
         newAccount.UserID = owner.UserID;
+
         owner.Accounts.Add(newAccount);
+
+        Console.WriteLine();
+        Ui.Success($"Sparkontot {newAccount.AccountName} har öppnats.");
+        Ui.Pause();
+        return true;
     }
 
-    public void ChooseCurrency(Account newAccount)
+    public bool ChooseCurrency(Account newAccount)
     {
-        Console.WriteLine("Vilken valuta vill du använda?\n");
-        Console.WriteLine("1. SEK");
-        Console.WriteLine("2. EUR");
-        Console.WriteLine("3. USD");
-            while (true)
+        while (true)
+        {
+            Console.WriteLine();
+            Console.WriteLine("  Vilken valuta vill du använda?");
+            Ui.Option("1", "SEK");
+            Ui.Option("2", "EUR");
+            Ui.Option("3", "USD");
+            Ui.Option("0", "Avbryt och gå tillbaka till BANKKONTON");
+            Console.WriteLine();
+
+            string choice = Ui.Ask("  Val: ");
+
+            switch (choice)
             {
-                string? userInput = Console.ReadLine();
-                switch (userInput)
-                {
-                    case "1":
-                        newAccount.Currency = Bankapp.CurrencyType.Sek;
-                        return;
-                    case "2":
-                        newAccount.Currency = Bankapp.CurrencyType.Eur;
-                        return;
-                    case "3":
-                        newAccount.Currency = Bankapp.CurrencyType.Usd;
-                        return;
-                    default:
-                        Console.WriteLine("Ogiltigt tal / Försök igen");
-                        break;
-                }
+                case "1":
+                    newAccount.Currency = CurrencyType.Sek;
+                    return true;
+
+                case "2":
+                    newAccount.Currency = CurrencyType.Eur;
+                    return true;
+
+                case "3":
+                    newAccount.Currency = CurrencyType.Usd;
+                    return true;
+
+                case "0":
+                    return false;
+
+                default:
+                    Ui.Error("Välj 1, 2, 3 eller 0 för att avbryta.");
+                    break;
             }
+        }
     }
+
+    private static string? AskAccountName(string prompt)
+    {
+        while (true)
+        {
+            string input = Ui.Ask(
+                $"{prompt.TrimEnd().TrimEnd(':')} (0 = avbryt): ");
+
+            if (input == "0")
+                return null;
+
+            if (int.TryParse(input, out _))
+            {
+                Ui.Error("Namn kan inte vara en siffra.");
+                continue;
+            }
+
+            return input;
+        }
+    }
+
     public long CreateAccountNumber()
     {
         Random rnd = new Random();
-        long AccountNumber = rnd.Next(999999999);
-
-        return AccountNumber;
+        return rnd.Next(999999999);
     }
 }

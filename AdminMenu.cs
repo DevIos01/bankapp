@@ -10,12 +10,11 @@ public static class AdminMenu
     {
         while (true)
         {
-            Console.WriteLine("[1] Skapa användare");
-            Console.WriteLine("[2] Lås upp användare");
-            Console.WriteLine("[0] Logga ut");
-            Console.Write("Val: ");
-
-            string? choice = Console.ReadLine();
+            Ui.Header("ADMIN");
+            Ui.Option("1", "Skapa användare");
+            Ui.Option("2", "Lås upp användare");
+            Ui.Option("0", "Logga ut");
+            string choice = Ui.Choice();
 
             switch (choice)
             {
@@ -32,6 +31,7 @@ public static class AdminMenu
 
                 default:
                     Ui.Error("Fel val, försök igen.");
+                    Ui.Pause();
                     break;
             }
         }
@@ -39,34 +39,31 @@ public static class AdminMenu
 
     static void CreateUser(List<User> allUsers)
     {
-        string username = Ui.Ask("Användarnamn: ");
+        Ui.Header("SKAPA ANVÄNDARE");
+        string username = Ui.Ask("  Användarnamn: ");
         if (allUsers.Any(user => user.Username == username))
         {
             Ui.Error("Användarnamnet är upptaget.");
+            Ui.Pause();
             return;
         }
 
-        string password = Ui.Ask("Lösenord: ");
+        string password = Ui.AskPassword("  Lösenord:     ");
 
-        Console.WriteLine("[1] Kund");
-        Console.WriteLine("[2] Admin");
-        Console.Write("Välj roll: ");
-        string? roleChoice = Console.ReadLine();
+        Console.WriteLine();
+        Ui.Option("1", "Kund");
+        Ui.Option("2", "Admin");
+        int roleChoice = Ui.AskNumber("  Roll: ", 1, 2);
 
         UserRole role;
 
-        if (roleChoice == "1")
+        if (roleChoice == 1)
         {
             role = UserRole.Customer;
         }
-        else if (roleChoice == "2")
-        {
-            role = UserRole.Admin;
-        }
         else
         {
-            Ui.Error("Ogiltigt rollval.");
-            return;
+            role = UserRole.Admin;
         }
 
         User newUser = new User
@@ -76,35 +73,51 @@ public static class AdminMenu
             Role = role
         };
 
+        // customers get a personkonto, same as when they sign up themselves
+        if (role == UserRole.Customer)
+        {
+            Account personkonto = new Account
+            {
+                AccountName = "Personkonto",
+                AccountNumber = new Account().CreateAccountNumber(),
+                UserID = newUser.UserID,
+                Currency = CurrencyType.Sek
+            };
+
+            newUser.Accounts.Add(personkonto);
+        }
+
         allUsers.Add(newUser);
         UserStore.Save(allUsers);
 
+        Console.WriteLine();
         Ui.Success("Användaren har skapats.");
+        Ui.Pause();
     } //create user with user-type
     static void UnlockUser(List<User> allUsers)
     {
+        Ui.Header("LÅS UPP ANVÄNDARE");
         List<User> lockedUsers =
             allUsers.Where(user => user.IsLocked).ToList();
 
         if (lockedUsers.Count == 0)
         {
-            Console.WriteLine("Det finns inga låsta användare.");
+            Console.WriteLine("  Det finns inga låsta användare.");
+            Ui.Pause();
             return;
         }
 
         for (int i = 0; i < lockedUsers.Count; i++)
         {
-            Console.WriteLine($"[{i + 1}] {lockedUsers[i].Username}");
+            Ui.Option($"{i + 1}", lockedUsers[i].Username);
         }
+        Ui.Option("0", "Tillbaka");
+        Console.WriteLine();
 
-        Console.Write("Välj användare : ");
-        string? input = Console.ReadLine();
+        int selection = Ui.AskNumber("  Val: ", 0, lockedUsers.Count);
 
-        if (!int.TryParse(input, out int selection) ||
-            selection < 1 ||
-            selection > lockedUsers.Count)
+        if (selection == 0)
         {
-            Ui.Error("Ogiltigt val.");
             return;
         }
 
@@ -112,6 +125,8 @@ public static class AdminMenu
         selectedUser.FailedLoginAttempts = 0;
 
         UserStore.Save(allUsers);
+        Console.WriteLine();
         Ui.Success($"{selectedUser.Username} har låsts upp.");
-    } //unlock locked users 
+        Ui.Pause();
+    } //unlock locked users
 }
