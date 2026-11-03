@@ -275,11 +275,11 @@ namespace Bankapp
                 if (input == "0")
                     return null;
 
-                if (int.TryParse(input, out int choice) &&
-                    choice >= 1 &&
-                    choice <= user.Accounts.Count)
+                if (int.TryParse(input, out int accountChoice) &&
+                    accountChoice >= 1 &&
+                    accountChoice <= user.Accounts.Count)
                 {
-                    return user.Accounts[choice - 1];
+                    return user.Accounts[accountChoice - 1];
                 }
 
                 Ui.Error(
