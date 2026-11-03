@@ -13,6 +13,7 @@ public static class AdminMenu
             Ui.Header("ADMIN");
             Ui.Option("1", "Skapa användare");
             Ui.Option("2", "Lås upp användare");
+            Ui.Option("3", "Statistik för användare");
             Ui.Option("0", "Logga ut");
             string choice = Ui.Choice();
 
@@ -24,6 +25,10 @@ public static class AdminMenu
 
                 case "2":
                     UnlockUser(allUsers);
+                    break;
+
+                case "3":
+                    UserStats.Show(allUsers);
                     break;
 
                 case "0":
