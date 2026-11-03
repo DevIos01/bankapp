@@ -400,5 +400,40 @@ namespace Bankapp
 
             Ui.Pause();
         }
+
+        public static void TransferBetweenAccounts(User loggedInUser, List<User> allUser)
+        {
+            Console.WriteLine("Välj konto att överföra från:");
+            Account? fromAccount = loggedInUser.SelectAccount();
+            if (fromAccount is null)
+            {
+                return;
+            }
+            Console.WriteLine("Välj konto att överföra till:");
+            Account? toAccount = loggedInUser.SelectAccount();
+            if (toAccount is null)
+            {
+                return;
+            }
+            Console.Write("Ange belopp: ");
+            string? input = Console.ReadLine();
+            if (!decimal.TryParse(input, out decimal amount))
+            {
+                Ui.Error("Ogiltigt belopp.");
+                return;
+            }
+            
+            if (loggedInUser.TransferMoney(fromAccount, toAccount , amount))
+            {
+                Ui.Success("Överföringen lyckades.");
+                UserStore.Save(allUser);
+            }
+            else
+            {
+                Ui.Error("Överföringen misslyckades.");
+            }
+
+
+        }
     }
 }

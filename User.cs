@@ -154,10 +154,48 @@ public class User
             return false;
         }
 
-        // Future improvement: support transfers between different currencies.
+        decimal convertedAmount = amount;
         if (fromAccount.Currency != toAccount.Currency)
         {
-            return false;
+            decimal amountInSek;
+
+            switch (fromAccount.Currency)
+            {
+                case CurrencyType.Sek:
+                    amountInSek = amount;
+                    break;
+
+                case CurrencyType.Usd:
+                    amountInSek = amount * ExchangeRateManager.UsdToSek;
+                    break;
+
+                case CurrencyType.Eur:
+                    amountInSek = amount * ExchangeRateManager.EurToSek;
+                    break;
+
+                default:
+                    return false;
+            }
+
+            switch (toAccount.Currency)
+            {
+                case CurrencyType.Sek:
+                    convertedAmount = amountInSek;
+                    break;
+
+                case CurrencyType.Usd:
+                    convertedAmount = amountInSek / ExchangeRateManager.UsdToSek;
+                    break;
+
+                case CurrencyType.Eur:
+                    convertedAmount = amountInSek / ExchangeRateManager.EurToSek;
+                    break;
+
+                default:
+                    return false;
+            }
+
+            convertedAmount = Math.Round(convertedAmount, 2);
         }
 
         if (!fromAccount.Withdraw(amount))
@@ -165,7 +203,7 @@ public class User
             return false;
         }
 
-        if (!toAccount.Deposit(amount))
+        if (!toAccount.Deposit(convertedAmount))
         {
             fromAccount.Deposit(amount); // Rollback
             return false;
@@ -175,6 +213,7 @@ public class User
         return true;
 
     }
+
     public Account? SelectAccount()
     {
         if (Accounts.Count == 0)
