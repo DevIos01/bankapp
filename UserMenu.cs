@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bankapp;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -15,6 +16,7 @@ namespace Bankapp
                 Ui.Option("2", "Ändra personuppgifter");
                 Ui.Option("3", "Lån");
                 Ui.Option("0", "Logga ut");
+
                 string choice = Ui.Choice();
 
                 switch (choice)
@@ -39,9 +41,9 @@ namespace Bankapp
                         Ui.Pause();
                         break;
                 }
-
             }
         }
+
         public static void LoanMenu(User loggedInUser, List<User> allUser)
         {
             while (true)
@@ -50,18 +52,17 @@ namespace Bankapp
                 Ui.Option("1", "Se dina lån");
                 Ui.Option("2", "Ansök om lån");
                 Ui.Option("0", "Tillbaka");
+
                 string choice = Ui.Choice();
 
                 switch (choice)
                 {
                     case "1":
-                        Loan.ShowLoans(loggedInUser);
                         Console.WriteLine("  Kommer snart.");
                         Ui.Pause();
                         break;
 
                     case "2":
-                        Loan.RequestLoan(loggedInUser, allUser, LoanRules.DefaultRate);
                         Console.WriteLine("  Kommer snart.");
                         Ui.Pause();
                         break;
@@ -74,9 +75,9 @@ namespace Bankapp
                         Ui.Pause();
                         break;
                 }
-
             }
         }
+
         public static void AccountMenu(User loggedInUser, List<User> allUser)
         {
             while (true)
@@ -85,8 +86,11 @@ namespace Bankapp
                 Ui.Option("1", "Se bankkonton");
                 Ui.Option("2", "Skapa bankkonto");
                 Ui.Option("3", "Skapa sparkonto");
-                Ui.Option("4", "Överföringar");
+                Ui.Option("4", "Sätt in pengar");
+                Ui.Option("5", "Överför pengar");
+                Ui.Option("6", "Transaktionslogg");
                 Ui.Option("0", "Tillbaka");
+
                 string choice = Ui.Choice();
 
                 switch (choice)
@@ -108,9 +112,15 @@ namespace Bankapp
                         break;
 
                     case "4":
-                        // transfers come with BANK-14 / BANK-15
-                        Console.WriteLine("  Kommer snart.");
-                        Ui.Pause();
+                        DepositMenu(loggedInUser, allUser);
+                        break;
+
+                    case "5":
+                        TransferMenu(loggedInUser, allUser);
+                        break;
+
+                    case "6":
+                        TransactionLogMenu(loggedInUser);
                         break;
 
                     case "0":
@@ -121,9 +131,9 @@ namespace Bankapp
                         Ui.Pause();
                         break;
                 }
-
             }
         }
+
         public static void EditKyc(User loggedInUser, List<User> allUser)
         {
             while (true)
@@ -133,45 +143,262 @@ namespace Bankapp
                 Ui.Option("2", "Ändra e-post");
                 Ui.Option("3", "Ändra mobilnummer");
                 Ui.Option("0", "Tillbaka");
+
                 string choice = Ui.Choice();
 
                 switch (choice)
                 {
                     case "1":
-                        Console.WriteLine();
-                        Console.WriteLine($"  Nuvarande: {loggedInUser.FullName}");
-                        loggedInUser.FullName = Ui.Ask("  Nytt namn: ");
-                        UserStore.Save(allUser);
-                        Ui.Success("Sparat!");
-                        Ui.Pause();
-                        break;
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine($"  Nuvarande: {loggedInUser.FullName}");
+
+                            string? newName = AskOrCancel("  Nytt namn (0 = tillbaka): ");
+                            if (newName is null)
+                                break;
+
+                            loggedInUser.FullName = newName;
+                            UserStore.Save(allUser);
+                            Ui.Success("Sparat!");
+                            Ui.Pause();
+                            break;
+                        }
+
                     case "2":
-                        Console.WriteLine();
-                        Console.WriteLine($"  Nuvarande: {loggedInUser.Email}");
-                        loggedInUser.Email = Ui.AskEmail("  Ny e-post: ");
-                        UserStore.Save(allUser);
-                        Ui.Success("Sparat!");
-                        Ui.Pause();
-                        break;
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine($"  Nuvarande: {loggedInUser.Email}");
+
+                            string? newEmail = AskEmailOrCancel("  Ny e-post (0 = tillbaka): ");
+                            if (newEmail is null)
+                                break;
+
+                            loggedInUser.Email = newEmail;
+                            UserStore.Save(allUser);
+                            Ui.Success("Sparat!");
+                            Ui.Pause();
+                            break;
+                        }
+
                     case "3":
-                        Console.WriteLine();
-                        Console.WriteLine($"  Nuvarande: {loggedInUser.Phone}");
-                        loggedInUser.Phone = Ui.Ask("  Nytt mobilnummer: ");
-                        UserStore.Save(allUser);
-                        Ui.Success("Sparat!");
-                        Ui.Pause();
-                        break;
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine($"  Nuvarande: {loggedInUser.Phone}");
+
+                            string? newPhone = AskOrCancel("  Nytt mobilnummer (0 = tillbaka): ");
+                            if (newPhone is null)
+                                break;
+
+                            loggedInUser.Phone = newPhone;
+                            UserStore.Save(allUser);
+                            Ui.Success("Sparat!");
+                            Ui.Pause();
+                            break;
+                        }
+
                     case "0":
                         return;
+
                     default:
                         Ui.Error("Fel val, försök igen.");
                         Ui.Pause();
                         break;
+                }
+            }
+        }
 
+        private static string? AskOrCancel(string prompt)
+        {
+            while (true)
+            {
+                Console.Write(prompt);
+                string input = Console.ReadLine()?.Trim() ?? "";
+
+                if (input == "0")
+                    return null;
+
+                if (!string.IsNullOrWhiteSpace(input))
+                    return input;
+
+                Ui.Error("Får inte vara tomt.");
+            }
+        }
+
+        private static string? AskEmailOrCancel(string prompt)
+        {
+            while (true)
+            {
+                Console.Write(prompt);
+                string input = Console.ReadLine()?.Trim() ?? "";
+
+                if (input == "0")
+                    return null;
+
+                if (string.IsNullOrWhiteSpace(input))
+                {
+                    Ui.Error("Får inte vara tomt.");
+                    continue;
                 }
 
+                if (input.Contains('@'))
+                    return input;
+
+                Ui.Error("E-postadressen måste innehålla @.");
+            }
+        }
+
+        private static Account? ChooseAccount(User user, string prompt)
+        {
+            if (user.Accounts.Count == 0)
+            {
+                Ui.Error("Du har inga konton.");
+                Ui.Pause();
+                return null;
             }
 
+            while (true)
+            {
+                Console.WriteLine();
+
+                for (int i = 0; i < user.Accounts.Count; i++)
+                {
+                    Account account = user.Accounts[i];
+                    Ui.Option(
+                        $"{i + 1}",
+                        $"{account.AccountName} — {account.AccountNumber} — " +
+                        $"{account.Balance:N2} {account.Currency.ToString().ToUpper()}");
+                }
+
+                Ui.Option("0", "Avbryt och gå tillbaka till BANKKONTON");
+                string input = Ui.Ask(prompt);
+
+                if (input == "0")
+                    return null;
+
+                if (int.TryParse(input, out int choice) &&
+                    choice >= 1 &&
+                    choice <= user.Accounts.Count)
+                {
+                    return user.Accounts[choice - 1];
+                }
+
+                Ui.Error(
+                    $"Välj ett konto mellan 1 och {user.Accounts.Count}, " +
+                    "eller 0 för att avbryta.");
+            }
+        }
+
+        private static decimal? AskAmount()
+        {
+            while (true)
+            {
+                string input = Ui.Ask(
+                    "  Belopp (0 = avbryt och gå tillbaka till BANKKONTON): ");
+
+                if (input == "0")
+                    return null;
+
+                if (decimal.TryParse(input, out decimal amount))
+                    return amount;
+
+                Ui.Error("Ange ett giltigt belopp, eller 0 för att avbryta.");
+            }
+        }
+
+        private static void DepositMenu(User user, List<User> allUsers)
+        {
+            Ui.Header("SÄTT IN PENGAR");
+
+            Account? destination = ChooseAccount(user, "  Välj konto: ");
+            if (destination is null)
+                return;
+
+            decimal? amount = AskAmount();
+            if (amount is null)
+                return;
+
+            bool success = TransactionService.Deposit(
+                user, allUsers, destination, amount.Value);
+
+            if (success)
+            {
+                Ui.Success(
+                    $"Insättningen på {amount.Value:N2} " +
+                    $"{destination.Currency.ToString().ToUpper()} genomfördes.");
+            }
+            else
+            {
+                Ui.Error("Insättningen misslyckades. Beloppet måste vara större än noll.");
+            }
+
+            Ui.Pause();
+        }
+
+        private static void TransferMenu(User user, List<User> allUsers)
+        {
+            Ui.Header("ÖVERFÖR PENGAR");
+
+            Account? source = ChooseAccount(user, "  Välj från-konto: ");
+            if (source is null)
+                return;
+
+            Account? destination = ChooseAccount(user, "  Välj till-konto: ");
+            if (destination is null)
+                return;
+
+            decimal? amount = AskAmount();
+            if (amount is null)
+                return;
+
+            bool success = TransactionService.Transfer(
+                user, allUsers, source, destination, amount.Value);
+
+            if (success)
+            {
+                Ui.Success(
+                    $"Överföringen på {amount.Value:N2} " +
+                    $"{source.Currency.ToString().ToUpper()} genomfördes.");
+            }
+            else
+            {
+                Ui.Error("Överföringen misslyckades. Kontrollera belopp, saldo och valuta.");
+            }
+
+            Ui.Pause();
+        }
+
+        private static void TransactionLogMenu(User user)
+        {
+            Ui.Header("TRANSAKTIONSLOGG");
+
+            Account? account = ChooseAccount(user, "  Välj konto: ");
+            if (account is null)
+                return;
+
+            List<Transaction> transactions = account.GetTransactionLog();
+
+            Console.WriteLine();
+            Console.WriteLine(
+                $"  Transaktioner för {account.AccountName} ({account.AccountNumber}):");
+            Console.WriteLine();
+
+            if (transactions.Count == 0)
+            {
+                Console.WriteLine("  Inga transaktioner ännu.");
+            }
+            else
+            {
+                foreach (Transaction transaction in transactions)
+                {
+                    Console.WriteLine(
+                        $"  {transaction.Timestamp.ToLocalTime():yyyy-MM-dd HH:mm:ss} | " +
+                        $"{transaction.Type} | {transaction.From} → {transaction.To} | " +
+                        $"{transaction.Amount:N2} {account.Currency.ToString().ToUpper()} | " +
+                        $"{transaction.Status}");
+                }
+            }
+
+            Ui.Pause();
         }
     }
 }
