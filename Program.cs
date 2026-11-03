@@ -27,6 +27,7 @@ internal class Program
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         List<User> allUsers = UserStore.Load();
         EnsureDefaultAdmin(allUsers);
+        TransactionService.StartTimer(allUsers);
         StartMenu(allUsers);
     }
 

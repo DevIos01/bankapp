@@ -356,8 +356,8 @@ namespace Bankapp
             if (success)
             {
                 Ui.Success(
-                    $"Överföringen på {amount.Value:N2} " +
-                    $"{source.Currency.ToString().ToUpper()} genomfördes.");
+                    $"Överföringen på {amount.Value:N2} {source.Currency.ToString().ToUpper()} " +
+                    $"är registrerad och genomförs inom {TransactionService.WaitTime.TotalMinutes:0.#} min.");
             }
             else
             {
