@@ -5,6 +5,10 @@ public static class LoanRules
     //  minimum interest 4 %
     public static decimal DefaultRate { get; set; } = 0.04m;
 
+    public static decimal ShowRate(decimal defaultRate)
+    {
+        return defaultRate * 10m;
+    }
     public static decimal GetMaxLoanAmount(decimal accountBalance)
     {
         return accountBalance * 2m; // accountbalance x 2 = max loan

@@ -50,12 +50,11 @@ public class Loan
             Ui.Pause();
             return;
         }
-
         decimal rate = LoanRules.GetAnnualInterestRate(accountBalance, defaultRate);
         decimal interestCost = loanAmount * rate * durationYears;
         decimal totalCost = loanAmount + interestCost;
 
-        Console.WriteLine($"Årsränta: {rate}");
+Console.WriteLine($"Årsränta: {rate*10m}%");
         Console.WriteLine($"Beräknad ränta för hela löptiden: {interestCost} kr");
         Console.WriteLine($"Totalt att betala enligt enkel ränta: {totalCost} kr");
 
@@ -131,7 +130,7 @@ public class Loan
 
             Console.WriteLine($"\nLån {i + 1}");
             Console.WriteLine($"Belopp: {loan.LoanAmount} kr");
-            Console.WriteLine($"Årsränta: {loan.AnnualInterestRate}");
+            Console.WriteLine($"Årsränta: {loan.AnnualInterestRate * 10m}%");
             Console.WriteLine($"Löptid: {loan.LoanDurationYears} år");
             Console.WriteLine($"Ränta totalt: {loan.InterestCost} kr");
             Console.WriteLine($"Totalt att betala: {loan.TotalCost} kr");
