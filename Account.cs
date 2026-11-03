@@ -37,6 +37,26 @@ public class Account
         return Transactions.OrderByDescending(t => t.Timestamp).ToList();
     }
 
+    public bool OpenNewAccount(User owner)
+    {
+        Ui.Header("NYTT KONTO");
+
+        string? accountName = AskAccountName("  Namn på konto: ");
+        if (accountName is null)
+            return false;
+
+        Account newAccount = new Account
+        {
+            AccountName = accountName,
+            AccountNumber = CreateAccountNumber(),
+            UserID = owner.UserID
+        };
+
+        if (!ChooseCurrency(newAccount))
+            return false;
+
+        owner.Accounts.Add(newAccount);
+
         Console.WriteLine();
         Ui.Success($"Kontot {newAccount.AccountName} har öppnats.");
         Ui.Pause();
