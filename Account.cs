@@ -13,35 +13,29 @@ public class Account
     public decimal Balance { get; private set; }
     public Guid UserID;
 
-    internal void Credit(decimal amount)
+    public List<Transaction> Transactions = new List<Transaction>();
+    public bool Deposit(decimal amount)
     {
+        if (amount <= 0)
+            return false;
         Balance += amount;
+        return true;
     }
-
-    internal void Debit(decimal amount)
+    public bool Withdraw(decimal amount)
     {
+        if (amount <= 0 || amount > Balance)
+            return false;
         Balance -= amount;
+        return true;
     }
-
-    public bool OpenNewAccount(User owner)
+    public void AddTransaction(Transaction transaction)
     {
-        Ui.Header("NYTT KONTO");
-
-        string? accountName = AskAccountName("  Namn på konto: ");
-        if (accountName is null)
-            return false;
-
-        Account newAccount = new Account
-        {
-            AccountName = accountName,
-            AccountNumber = CreateAccountNumber(),
-            UserID = owner.UserID
-        };
-
-        if (!ChooseCurrency(newAccount))
-            return false;
-
-        owner.Accounts.Add(newAccount);
+        Transactions.Add(transaction);
+    }
+    public List<Transaction> GetTransactionLog()
+    {
+        return Transactions.OrderByDescending(t => t.Timestamp).ToList();
+    }
 
         Console.WriteLine();
         Ui.Success($"Kontot {newAccount.AccountName} har öppnats.");
