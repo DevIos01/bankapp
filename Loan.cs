@@ -54,7 +54,7 @@ public class Loan
         decimal interestCost = loanAmount * rate * durationYears;
         decimal totalCost = loanAmount + interestCost;
 
-Console.WriteLine($"Årsränta: {rate*10m}%");
+Console.WriteLine($"Årsränta: {rate*100m}%");
         Console.WriteLine($"Beräknad ränta för hela löptiden: {interestCost} kr");
         Console.WriteLine($"Totalt att betala enligt enkel ränta: {totalCost} kr");
 
