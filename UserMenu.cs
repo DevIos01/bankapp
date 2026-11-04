@@ -275,11 +275,11 @@ namespace Bankapp
                 if (input == "0")
                     return null;
 
-                if (int.TryParse(input, out int choice) &&
-                    choice >= 1 &&
-                    choice <= user.Accounts.Count)
+                if (int.TryParse(input, out int accountChoice) &&
+                    accountChoice >= 1 &&
+                    accountChoice <= user.Accounts.Count)
                 {
-                    return user.Accounts[choice - 1];
+                    return user.Accounts[accountChoice - 1];
                 }
 
                 Ui.Error(
@@ -361,7 +361,7 @@ namespace Bankapp
             }
             else
             {
-                Ui.Error("Överföringen misslyckades. Kontrollera belopp, saldo och valuta.");
+                Ui.Error("Överföringen misslyckades. Kontrollera belopp och saldo.");
             }
 
             Ui.Pause();
@@ -390,15 +390,53 @@ namespace Bankapp
             {
                 foreach (Transaction transaction in transactions)
                 {
+                    string amount = transaction.Exchange ??
+                        $"{transaction.Amount:N2} {account.Currency.ToString().ToUpper()}";
+
                     Console.WriteLine(
                         $"  {transaction.Timestamp.ToLocalTime():yyyy-MM-dd HH:mm:ss} | " +
                         $"{transaction.Type} | {transaction.From} → {transaction.To} | " +
-                        $"{transaction.Amount:N2} {account.Currency.ToString().ToUpper()} | " +
+                        $"{amount} | " +
                         $"{transaction.Status}");
                 }
             }
 
             Ui.Pause();
+        }
+
+        public static void TransferBetweenAccounts(User loggedInUser, List<User> allUser)
+        {
+            Console.WriteLine("Välj konto att överföra från:");
+            Account? fromAccount = loggedInUser.SelectAccount();
+            if (fromAccount is null)
+            {
+                return;
+            }
+            Console.WriteLine("Välj konto att överföra till:");
+            Account? toAccount = loggedInUser.SelectAccount();
+            if (toAccount is null)
+            {
+                return;
+            }
+            Console.Write("Ange belopp: ");
+            string? input = Console.ReadLine();
+            if (!decimal.TryParse(input, out decimal amount))
+            {
+                Ui.Error("Ogiltigt belopp.");
+                return;
+            }
+            
+            if (loggedInUser.TransferMoney(fromAccount, toAccount , amount))
+            {
+                Ui.Success("Överföringen lyckades.");
+                UserStore.Save(allUser);
+            }
+            else
+            {
+                Ui.Error("Överföringen misslyckades.");
+            }
+
+
         }
     }
 }

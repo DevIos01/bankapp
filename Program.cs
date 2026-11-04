@@ -28,6 +28,7 @@ internal class Program
         List<User> allUsers = UserStore.Load();
         EnsureDefaultAdmin(allUsers);
         StartMenu(allUsers);
+
     }
 
     static void StartMenu(List<User> allUsers)

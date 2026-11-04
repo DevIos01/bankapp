@@ -138,5 +138,72 @@ public class User
         return null;
 
     }
+
+    public bool TransferMoney(Account fromAccount, Account toAccount, decimal amount)
+    {
+        if (!Accounts.Contains(fromAccount) || !Accounts.Contains(toAccount))
+        {
+            return false;
+        }
+
+        if (fromAccount.AccountNumber == toAccount.AccountNumber)
+        {
+            return false;
+        }
+        if (amount <= 0 || amount > fromAccount.Balance)
+        {
+            return false;
+        }
+
+
+        decimal convertedAmount = ExchangeRateManager.Convert(amount, fromAccount.Currency, toAccount.Currency);
+
+        if (!fromAccount.Withdraw(amount))
+        {
+            return false;
+        }
+
+        if (!toAccount.Deposit(convertedAmount))
+        {
+            fromAccount.Deposit(amount); // Rollback
+            return false;
+        }
+
+        // Point of integration for transaction logging
+        return true;
+
+    }
+
+
+
+    public Account? SelectAccount()
+    {
+        if (Accounts.Count == 0)
+        {
+            Console.WriteLine("Du har inga konton!");
+            return null;
+        }
+        while (true)
+        {
+
+            DisplayAccountInfo();
+            Console.Write("Välj kontonummer: ");
+            string? input = Console.ReadLine();
+
+            if (!int.TryParse(input, out int selection))
+            {
+                Console.WriteLine("Ogiltigt val!");
+                continue;
+            }
+            if (selection < 1 || selection > Accounts.Count)
+            {
+                Console.WriteLine("Ogiltigt val!");
+                continue;
+            }
+            return Accounts[selection - 1];
+
+        }
+        
+    }
 }
 

@@ -13,6 +13,7 @@ public class Transaction
     public long? FromAccountNumber { get; set; }
     public long? ToAccountNumber { get; set; }
     public decimal Amount { get; set; }
+    public string? Exchange { get; set; } // e.g. "10,00 USD → 100,00 SEK" when the currencies differ
     public string Status { get; set; } = "";
 }
 
@@ -48,18 +49,21 @@ public static class TransactionService
         Account destination,
         decimal amount)
     {
+        decimal receivedAmount =
+            ExchangeRateManager.Convert(amount, source.Currency, destination.Currency);
+
         bool success =
             user.Accounts.Contains(source) &&
             user.Accounts.Contains(destination) &&
             source != destination &&
-            source.Currency == destination.Currency &&
             amount > 0 &&
+            receivedAmount > 0 &&
             source.Balance >= amount;
 
         if (success)
         {
             source.Withdraw(amount);
-            destination.Deposit(amount);
+            destination.Deposit(receivedAmount);
         }
 
         Transaction transaction = new Transaction
@@ -70,6 +74,10 @@ public static class TransactionService
             FromAccountNumber = source.AccountNumber,
             ToAccountNumber = destination.AccountNumber,
             Amount = amount,
+            Exchange = source.Currency == destination.Currency
+                ? null
+                : $"{amount:N2} {source.Currency.ToString().ToUpper()} → " +
+                  $"{receivedAmount:N2} {destination.Currency.ToString().ToUpper()}",
             Status = success ? "Genomförd" : "Misslyckad"
         };
 
