@@ -106,7 +106,16 @@ Console.WriteLine($"Årsränta: {rate*100m}%");
         };
 
         loggedInUser.Loans.Add(loan);
-        payoutAccount.Deposit(loanAmount); // Se över funktion
+        payoutAccount.Deposit(loanAmount);
+        payoutAccount.AddTransaction(new Transaction
+        {
+            Type = "Lån",
+            From = "Banken",
+            To = $"{payoutAccount.AccountName} ({payoutAccount.AccountNumber})",
+            ToAccountNumber = payoutAccount.AccountNumber,
+            Amount = loanAmount,
+            Status = "Genomförd"
+        });
         UserStore.Save(allUsers);
 
         Ui.Success("Lånet har betalats ut till ditt konto.");
