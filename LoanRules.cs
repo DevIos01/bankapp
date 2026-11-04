@@ -8,7 +8,7 @@ public static class LoanRules
     
     public static decimal GetMaxLoanAmount(decimal accountBalance)
     {
-        return accountBalance * 5m; // accountbalance x 2 = max loan
+        return accountBalance * 5m; // max loan = 5 x own money
     }
 
     public static decimal GetAnnualInterestRate(
