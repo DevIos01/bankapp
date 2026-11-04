@@ -155,33 +155,4 @@ public class Account
     }
 }
 
-    //public decimal Balance { get;  set; }
-    //public Guid UserID;
-
-//    public bool Withdraw(decimal amount)
-//    {
-//        if (amount <= 0)
-//        {
-//            return false;
-//        }
-//        else if (Balance < amount)
-//        {
-//            return false;
-//        }
-//        else
-//        {
-//            Balance -= amount;
-//            return true;
-//        }
-//    }
-//    public bool Deposit(decimal amount)
-//    {
-//        if (amount > 0)
-//        {
-//            Balance += amount;
-//            return true;
-//        }
-//        return false;
-//    }
-//}
-//>>>>>>> Stashed changes
+   
