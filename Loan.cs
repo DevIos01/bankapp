@@ -24,6 +24,8 @@ public class Loan
        List<User> allUsers,
        decimal defaultRate)
     {
+        Ui.Header("ANSÖK OM LÅN");
+
         // Räkna alla konton omräknat till SEK, minus det som redan är lånat.
         decimal totalLoans = loggedInUser.Loans.Sum(loan => loan.LoanAmount);
         decimal accountBalance = loggedInUser.Accounts
@@ -32,10 +34,11 @@ public class Loan
 
         decimal maxLoan = Math.Max(0m, LoanRules.GetMaxLoanAmount(accountBalance) - totalLoans);
 
-        Console.WriteLine($"Egna pengar i banken: {accountBalance:N2} kr");
-        Console.WriteLine($"Du kan låna högst: {maxLoan:N2} kr");
+        Console.WriteLine($"  Egna pengar i banken: {accountBalance:N2} kr");
+        Console.WriteLine($"  Du kan låna högst:    {maxLoan:N2} kr");
+        Console.WriteLine();
 
-        if (!decimal.TryParse(Ui.Ask("Lånebelopp: "), out decimal loanAmount) ||
+        if (!decimal.TryParse(Ui.Ask("  Lånebelopp: "), out decimal loanAmount) ||
             loanAmount <= 0 ||
             loanAmount > maxLoan)
         {
@@ -44,7 +47,7 @@ public class Loan
             return;
         }
 
-        if (!int.TryParse(Ui.Ask("Löptid i hela år: "), out int durationYears) ||
+        if (!int.TryParse(Ui.Ask("  Löptid i hela år: "), out int durationYears) ||
             durationYears <= 0)
         {
             Ui.Error("Ange en giltig löptid.");
@@ -55,9 +58,11 @@ public class Loan
         decimal interestCost = loanAmount * rate * durationYears;
         decimal totalCost = loanAmount + interestCost;
 
-Console.WriteLine($"Årsränta: {rate*100m}%");
-        Console.WriteLine($"Beräknad ränta för hela löptiden: {interestCost} kr");
-        Console.WriteLine($"Totalt att betala enligt enkel ränta: {totalCost} kr");
+        Console.WriteLine();
+        Console.WriteLine($"  Årsränta: {rate * 100m}%");
+        Console.WriteLine($"  Beräknad ränta för hela löptiden: {interestCost:N2} kr");
+        Console.WriteLine($"  Totalt att betala enligt enkel ränta: {totalCost:N2} kr");
+        Console.WriteLine();
 
         // Välj ett konto i SEK att betala ut lånet till.
         var payoutAccounts = loggedInUser.Accounts
@@ -73,11 +78,13 @@ Console.WriteLine($"Årsränta: {rate*100m}%");
 
         for (int i = 0; i < payoutAccounts.Count; i++)
         {
-            Console.WriteLine(
-                $"[{i + 1}] Konto {payoutAccounts[i].AccountNumber} – {payoutAccounts[i].Balance:N2} kr");
+            Ui.Option(
+                $"{i + 1}",
+                $"{payoutAccounts[i].AccountName} — {payoutAccounts[i].AccountNumber} — " +
+                $"{payoutAccounts[i].Balance:N2} SEK");
         }
 
-        if (!int.TryParse(Ui.Ask("Välj konto: "), out int selection) ||
+        if (!int.TryParse(Ui.Ask("  Välj konto: "), out int selection) ||
             selection < 1 ||
             selection > payoutAccounts.Count)
         {
@@ -88,10 +95,10 @@ Console.WriteLine($"Årsränta: {rate*100m}%");
 
         Account payoutAccount = payoutAccounts[selection - 1];
 
-        if (!Ui.Ask("Bekräfta lånet? (j/n): ")
+        if (!Ui.Ask("  Bekräfta lånet? (j/n): ")
             .Equals("j", StringComparison.OrdinalIgnoreCase))
         {
-            Console.WriteLine("Lånet avbröts.");
+            Console.WriteLine("  Lånet avbröts.");
             Ui.Pause();
             return;
         }
@@ -124,12 +131,11 @@ Console.WriteLine($"Årsränta: {rate*100m}%");
 
     public static void ShowLoans(User loggedInUser) //show loan amount, interest, duration and  total cost
     {
-        Console.Clear();
-        Console.WriteLine("=== Mina lån ===");
+        Ui.Header("MINA LÅN");
 
         if (loggedInUser.Loans.Count == 0)
         {
-            Console.WriteLine("Du har inga lån.");
+            Console.WriteLine("  Du har inga lån.");
             Ui.Pause();
             return;
         }
@@ -138,13 +144,14 @@ Console.WriteLine($"Årsränta: {rate*100m}%");
         {
             Loan loan = loggedInUser.Loans[i];
 
-            Console.WriteLine($"\nLån {i + 1}");
-            Console.WriteLine($"Belopp: {loan.LoanAmount} kr");
-            Console.WriteLine($"Årsränta: {loan.AnnualInterestRate * 100m}%");
-            Console.WriteLine($"Löptid: {loan.LoanDurationYears} år");
-            Console.WriteLine($"Ränta totalt: {loan.InterestCost} kr");
-            Console.WriteLine($"Totalt att betala: {loan.TotalCost} kr");
-            Console.WriteLine($"Utbetalt till konto: {loan.PayoutAccountNumber}");
+            Console.WriteLine($"  Lån {i + 1}");
+            Console.WriteLine($"    Belopp:              {loan.LoanAmount:N2} kr");
+            Console.WriteLine($"    Årsränta:            {loan.AnnualInterestRate * 100m}%");
+            Console.WriteLine($"    Löptid:              {loan.LoanDurationYears} år");
+            Console.WriteLine($"    Ränta totalt:        {loan.InterestCost:N2} kr");
+            Console.WriteLine($"    Totalt att betala:   {loan.TotalCost:N2} kr");
+            Console.WriteLine($"    Utbetalt till konto: {loan.PayoutAccountNumber}");
+            Console.WriteLine();
         }
 
         Ui.Pause();
