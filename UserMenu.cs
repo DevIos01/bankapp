@@ -63,7 +63,7 @@ namespace Bankapp
 
                     case "2":
                         Loan.RequestLoan(loggedInUser, allUser, LoanRules.DefaultRate);
-                        break;
+                        break; 
                         
                     case "0":
                         return;
