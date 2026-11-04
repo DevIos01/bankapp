@@ -361,7 +361,7 @@ namespace Bankapp
             }
             else
             {
-                Ui.Error("Överföringen misslyckades. Kontrollera belopp, saldo och valuta.");
+                Ui.Error("Överföringen misslyckades. Kontrollera belopp och saldo.");
             }
 
             Ui.Pause();
@@ -390,10 +390,13 @@ namespace Bankapp
             {
                 foreach (Transaction transaction in transactions)
                 {
+                    string amount = transaction.Exchange ??
+                        $"{transaction.Amount:N2} {account.Currency.ToString().ToUpper()}";
+
                     Console.WriteLine(
                         $"  {transaction.Timestamp.ToLocalTime():yyyy-MM-dd HH:mm:ss} | " +
                         $"{transaction.Type} | {transaction.From} → {transaction.To} | " +
-                        $"{transaction.Amount:N2} {account.Currency.ToString().ToUpper()} | " +
+                        $"{amount} | " +
                         $"{transaction.Status}");
                 }
             }

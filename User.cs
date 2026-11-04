@@ -155,61 +155,14 @@ public class User
         }
 
 
-        decimal convertedAmount = amount;
-        if (fromAccount.Currency != toAccount.Currency)
-        {
-            decimal amountInSek;
-
-            switch (fromAccount.Currency)
-            {
-                case CurrencyType.Sek:
-                    amountInSek = amount;
-                    break;
-
-                case CurrencyType.Usd:
-                    amountInSek = amount * ExchangeRateManager.UsdToSek;
-                    break;
-
-                case CurrencyType.Eur:
-                    amountInSek = amount * ExchangeRateManager.EurToSek;
-                    break;
-
-                default:
-                    return false;
-            }
-
-            switch (toAccount.Currency)
-            {
-                case CurrencyType.Sek:
-                    convertedAmount = amountInSek;
-                    break;
-
-                case CurrencyType.Usd:
-                    convertedAmount = amountInSek / ExchangeRateManager.UsdToSek;
-                    break;
-
-                case CurrencyType.Eur:
-                    convertedAmount = amountInSek / ExchangeRateManager.EurToSek;
-                    break;
-
-                default:
-                    return false;
-            }
-
-            convertedAmount = Math.Round(convertedAmount, 2);
-
-        
+        decimal convertedAmount = ExchangeRateManager.Convert(amount, fromAccount.Currency, toAccount.Currency);
 
         if (!fromAccount.Withdraw(amount))
         {
             return false;
         }
 
-
         if (!toAccount.Deposit(convertedAmount))
-
-        if (!toAccount.Deposit(amount))
-
         {
             fromAccount.Deposit(amount); // Rollback
             return false;
