@@ -24,15 +24,16 @@ public class Loan
        List<User> allUsers,
        decimal defaultRate)
     {
-        // Räkna bara SEK-konton, eftersom exemplet saknar valutakonvertering.
+        // Räkna alla konton omräknat till SEK, minus det som redan är lånat.
+        decimal totalLoans = loggedInUser.Loans.Sum(loan => loan.LoanAmount);
         decimal accountBalance = loggedInUser.Accounts
-            .Where(account => account.Currency == CurrencyType.Sek)
-            .Sum(account => account.Balance);
+            .Sum(account => ExchangeRateManager.Convert(account.Balance, account.Currency, CurrencyType.Sek))
+            - totalLoans;
 
-        decimal maxLoan = LoanRules.GetMaxLoanAmount(accountBalance);
+        decimal maxLoan = Math.Max(0m, LoanRules.GetMaxLoanAmount(accountBalance) - totalLoans);
 
-        Console.WriteLine($"Tillgångar på SEK-konton: {accountBalance} kr");
-        Console.WriteLine($"Du kan låna högst: {maxLoan} kr");
+        Console.WriteLine($"Egna pengar i banken: {accountBalance:N2} kr");
+        Console.WriteLine($"Du kan låna högst: {maxLoan:N2} kr");
 
         if (!decimal.TryParse(Ui.Ask("Lånebelopp: "), out decimal loanAmount) ||
             loanAmount <= 0 ||
