@@ -198,12 +198,7 @@ public class User
 
             convertedAmount = Math.Round(convertedAmount, 2);
 
-        //// Future improvement: support transfers between different currencies.
-        //if (fromAccount.Currency != toAccount.Currency)
-        //{
-        //    return false;
-
-        //}
+        
 
         if (!fromAccount.Withdraw(amount))
         {
