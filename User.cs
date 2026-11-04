@@ -197,24 +197,24 @@ public class User
             }
 
             convertedAmount = Math.Round(convertedAmount, 2);
-=======
-        // Future improvement: support transfers between different currencies.
-        if (fromAccount.Currency != toAccount.Currency)
-        {
-            return false;
->>>>>>> Stashed changes
-        }
+
+        //// Future improvement: support transfers between different currencies.
+        //if (fromAccount.Currency != toAccount.Currency)
+        //{
+        //    return false;
+
+        //}
 
         if (!fromAccount.Withdraw(amount))
         {
             return false;
         }
 
-<<<<<<< Updated upstream
+
         if (!toAccount.Deposit(convertedAmount))
-=======
+
         if (!toAccount.Deposit(amount))
->>>>>>> Stashed changes
+
         {
             fromAccount.Deposit(amount); // Rollback
             return false;
@@ -224,10 +224,9 @@ public class User
         return true;
 
     }
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
+
+
     public Account? SelectAccount()
     {
         if (Accounts.Count == 0)

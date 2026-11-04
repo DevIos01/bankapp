@@ -29,41 +29,6 @@ internal class Program
         EnsureDefaultAdmin(allUsers);
         StartMenu(allUsers);
 
-        //List<User> allUsers = new List<User>();
-        //User user1 = new User();
-        //user1.FullName = "Sima";
-        //Account account1 = new Account();
-        //account1.Balance = 500;
-        //account1.Currency = CurrencyType.Usd;
-        //account1.AccountNumber = 100;
-        //Account account2 = new Account();
-        //account2.Balance = 200;
-        //account2.Currency = CurrencyType.Eur;
-        //account2.AccountNumber = 200;
-        //Account account3 = new Account();
-        //account3.Balance = 300;
-        //account3.Currency = CurrencyType.Sek;
-        //account3.AccountNumber = 300;
-        //user1.Accounts.Add(account1);
-        //user1.Accounts.Add(account2);
-        //user1.Accounts.Add(account3);
-        ////user1.DisplayAccountInfo();
-        //User user2 = new User();
-        //Account? fromAccount = user1.SelectAccount();
-        //Account? toAccount = user1.SelectAccount();
-        //bool success = user1.TransferMoney(fromAccount, toAccount, 10);
-
-        //if (success)
-        //{
-        //    Console.WriteLine("Transfer successful.");
-        //}
-        //else
-        //{
-        //    Console.WriteLine("Transfer failed.");
-        //}
-        //user1.DisplayAccountInfo();
-
-        //Console.ReadKey();
     }
 
     static void StartMenu(List<User> allUsers)
