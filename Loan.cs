@@ -140,7 +140,7 @@ Console.WriteLine($"Årsränta: {rate*100m}%");
 
             Console.WriteLine($"\nLån {i + 1}");
             Console.WriteLine($"Belopp: {loan.LoanAmount} kr");
-            Console.WriteLine($"Årsränta: {loan.AnnualInterestRate * 10m}%");
+            Console.WriteLine($"Årsränta: {loan.AnnualInterestRate * 100m}%");
             Console.WriteLine($"Löptid: {loan.LoanDurationYears} år");
             Console.WriteLine($"Ränta totalt: {loan.InterestCost} kr");
             Console.WriteLine($"Totalt att betala: {loan.TotalCost} kr");
