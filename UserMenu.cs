@@ -63,7 +63,6 @@ namespace Bankapp
 
                     case "2":
                         Loan.RequestLoan(loggedInUser, allUser, LoanRules.DefaultRate);
-                       // Ui.Pause();
                         break;
                         
                     case "0":
