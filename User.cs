@@ -154,7 +154,7 @@ public class User
             return false;
         }
 
-<<<<<<< Updated upstream
+
         decimal convertedAmount = amount;
         if (fromAccount.Currency != toAccount.Currency)
         {
