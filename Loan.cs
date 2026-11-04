@@ -105,7 +105,7 @@ Console.WriteLine($"Årsränta: {rate*100m}%");
         };
 
         loggedInUser.Loans.Add(loan);
-      //  payoutAccount.Deposit(loanAmount); // Se över funktion
+        payoutAccount.Deposit(loanAmount); // Se över funktion
         UserStore.Save(allUsers);
 
         Ui.Success("Lånet har betalats ut till ditt konto.");
