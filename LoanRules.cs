@@ -1,0 +1,34 @@
+﻿namespace Bankapp;
+
+public static class LoanRules
+{
+    //  minimum interest 4 %
+    public static decimal DefaultRate { get; set; } = 0.04m;
+
+    
+    public static decimal GetMaxLoanAmount(decimal accountBalance)
+    {
+        return accountBalance * 5m; // max loan = 5 x own money
+    }
+
+    public static decimal GetAnnualInterestRate(
+        decimal accountBalance,
+        decimal defaultRate)
+    {
+        const decimal rateStep = 0.05m;
+
+        int tier = accountBalance switch
+        {
+            >= 900_000m => 0,
+            >= 400_000m => 1,
+            > 50_000m => 2,
+            _ => 3
+        };
+
+        return Math.Max(defaultRate, 0.04m) + tier * rateStep;
+    }
+}
+
+
+
+

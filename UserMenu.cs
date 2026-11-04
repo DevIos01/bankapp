@@ -58,15 +58,13 @@ namespace Bankapp
                 switch (choice)
                 {
                     case "1":
-                        Console.WriteLine("  Kommer snart.");
-                        Ui.Pause();
+                        Loan.ShowLoans(loggedInUser);
                         break;
 
                     case "2":
-                        Console.WriteLine("  Kommer snart.");
-                        Ui.Pause();
-                        break;
-
+                        Loan.RequestLoan(loggedInUser, allUser, LoanRules.DefaultRate);
+                        break; 
+                        
                     case "0":
                         return;
 
