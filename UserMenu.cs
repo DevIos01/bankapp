@@ -59,7 +59,6 @@ namespace Bankapp
                 {
                     case "1":
                         Loan.ShowLoans(loggedInUser);
-                        // Ui.Pause();
                         break;
 
                     case "2":
