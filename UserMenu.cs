@@ -86,7 +86,8 @@ namespace Bankapp
                 Ui.Option("3", "Skapa sparkonto");
                 Ui.Option("4", "Sätt in pengar");
                 Ui.Option("5", "Överför pengar");
-                Ui.Option("6", "Transaktionslogg");
+                Ui.Option("6", "Överför till annan kund");
+                Ui.Option("7", "Transaktionslogg");
                 Ui.Option("0", "Tillbaka");
 
                 string choice = Ui.Choice();
@@ -118,6 +119,10 @@ namespace Bankapp
                         break;
 
                     case "6":
+                        TransferToOtherMenu(loggedInUser, allUser);
+                        break;
+
+                    case "7":
                         TransactionLogMenu(loggedInUser);
                         break;
 
@@ -349,6 +354,68 @@ namespace Bankapp
                 return;
 
             bool success = TransactionService.Transfer(
+                user, allUsers, source, destination, amount.Value);
+
+            if (success)
+            {
+                Ui.Success(
+                    $"Överföringen på {amount.Value:N2} " +
+                    $"{source.Currency.ToString().ToUpper()} genomfördes.");
+            }
+            else
+            {
+                Ui.Error("Överföringen misslyckades. Kontrollera belopp och saldo.");
+            }
+
+            Ui.Pause();
+        }
+
+        private static void TransferToOtherMenu(User user, List<User> allUsers)
+        {
+            Ui.Header("ÖVERFÖR TILL ANNAN KUND");
+
+            Account? source = ChooseAccount(user, "  Välj från-konto: ");
+            if (source is null)
+                return;
+
+            Account? destination = null;
+
+            // ask again on a typo instead of going back to the menu
+            while (destination is null)
+            {
+                string input = Ui.Ask("  Mottagarens kontonummer (0 = avbryt): ");
+                if (input == "0")
+                    return;
+
+                if (!long.TryParse(input, out long accountNumber))
+                {
+                    Ui.Error("Ogiltigt kontonummer.");
+                    continue;
+                }
+
+                destination =
+                    TransactionService.FindAccountByNumber(allUsers, accountNumber);
+
+                if (destination is null)
+                    Ui.Error("Kontot finns inte.");
+            }
+
+            decimal? amount = AskAmount();
+            if (amount is null)
+                return;
+
+            string confirm = Ui.Ask(
+                $"  Skicka {amount.Value:N2} {source.Currency.ToString().ToUpper()} " +
+                $"till {destination.AccountName} ({destination.AccountNumber})? (j/n): ");
+
+            if (confirm.Trim().ToLower() != "j")
+            {
+                Console.WriteLine("  Överföringen avbröts.");
+                Ui.Pause();
+                return;
+            }
+
+            bool success = TransactionService.TransferToOther(
                 user, allUsers, source, destination, amount.Value);
 
             if (success)
