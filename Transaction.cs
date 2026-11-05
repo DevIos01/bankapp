@@ -15,6 +15,7 @@ public class Transaction
     public long? FromAccountNumber { get; set; }
     public long? ToAccountNumber { get; set; }
     public decimal Amount { get; set; }
+    public string? Exchange { get; set; } // e.g. "10,00 USD → 100,00 SEK" when the currencies differ
     public string Status { get; set; } = "";
 }
 public static class TransactionStatus
@@ -64,12 +65,15 @@ public static class TransactionService
     {
         lock (Sync)
         {
+            decimal receivedAmount =
+                ExchangeRateManager.Convert(amount, source.Currency, destination.Currency);
+
             bool accepted =
                 user.Accounts.Contains(source) &&
                 user.Accounts.Contains(destination) &&
                 source != destination &&
-                source.Currency == destination.Currency &&
                 amount > 0 &&
+                receivedAmount > 0 &&
                 source.Balance >= amount;
 
             Transaction transaction = new Transaction
@@ -80,6 +84,10 @@ public static class TransactionService
                 FromAccountNumber = source.AccountNumber,
                 ToAccountNumber = destination.AccountNumber,
                 Amount = amount,
+                Exchange = source.Currency == destination.Currency
+                    ? null
+                    : $"{amount:N2} {source.Currency.ToString().ToUpper()} → " +
+                      $"{receivedAmount:N2} {destination.Currency.ToString().ToUpper()}",
                 Status = accepted ? TransactionStatus.Pending : TransactionStatus.Failed
             };
 
@@ -87,6 +95,58 @@ public static class TransactionService
 
             if (destination != source)
                 destination.AddTransaction(transaction);
+
+            UserStore.Save(allUsers);
+            return accepted;
+        }
+    }
+
+    public static Account? FindAccountByNumber(List<User> allUsers, long accountNumber)
+    {
+        foreach (User u in allUsers)
+        {
+            foreach (Account a in u.Accounts)
+            {
+                if (a.AccountNumber == accountNumber)
+                    return a;
+            }
+
+        }
+        return null;
+    }
+    public static bool TransferToOther(
+    User user, List<User> allUsers,
+    Account source, Account destination, decimal amount)
+    {
+        lock (Sync)
+        {
+            decimal receivedAmount =
+                ExchangeRateManager.Convert(amount, source.Currency, destination.Currency);
+
+            bool accepted =
+                user.Accounts.Contains(source) &&
+                source != destination &&
+                amount > 0 &&
+                receivedAmount > 0 &&
+                source.Balance >= amount;
+
+            Transaction transaction = new Transaction
+            {
+                Type = "Överföring",
+                From = $"{source.AccountName} ({source.AccountNumber})",
+                To = $"{destination.AccountName} ({destination.AccountNumber})",
+                FromAccountNumber = source.AccountNumber,
+                ToAccountNumber = destination.AccountNumber,
+                Amount = amount,
+                Exchange = source.Currency == destination.Currency
+                    ? null
+                    : $"{amount:N2} {source.Currency.ToString().ToUpper()} → " +
+                      $"{receivedAmount:N2} {destination.Currency.ToString().ToUpper()}",
+                Status = accepted ? TransactionStatus.Pending : TransactionStatus.Failed
+            };
+
+            source.AddTransaction(transaction);
+            if (accepted) destination.AddTransaction(transaction);
 
             UserStore.Save(allUsers);
             return accepted;
@@ -118,11 +178,12 @@ public static class TransactionService
                 bool ok =
                     source != null &&
                     destination != null &&
-                    source.Currency == destination.Currency &&
                     source.Withdraw(t.Amount);
 
+                // the receiver gets it in their own currency, same as Transfer shows
                 if (ok)
-                    destination!.Deposit(t.Amount);
+                    destination!.Deposit(
+                        ExchangeRateManager.Convert(t.Amount, source!.Currency, destination.Currency));
 
                 string status = ok ? TransactionStatus.Done : TransactionStatus.Failed;
 

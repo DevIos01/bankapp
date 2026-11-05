@@ -29,6 +29,7 @@ internal class Program
         EnsureDefaultAdmin(allUsers);
         TransactionService.StartTimer(allUsers);
         StartMenu(allUsers);
+
     }
 
     static void StartMenu(List<User> allUsers)
