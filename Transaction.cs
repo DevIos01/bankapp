@@ -133,6 +133,16 @@ public static class TransactionService
                     copy.Status = status;
                 }
 
+                if (ok)
+                {
+                    User? owner = allUsers.FirstOrDefault(u => u.UserID == source!.UserID);
+                    if (owner != null)
+                    {
+                        Notifications.NotifyUser(
+                            owner, t, source!.Currency.ToString().ToUpper());
+                    }
+                }
+
             }
 
             if (due.Count > 0)

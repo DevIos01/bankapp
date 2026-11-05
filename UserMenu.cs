@@ -142,6 +142,7 @@ namespace Bankapp
                 Ui.Option("1", "Ändra namn");
                 Ui.Option("2", "Ändra e-post");
                 Ui.Option("3", "Ändra mobilnummer");
+                Ui.Option("4", "Notifieringar (e-post/SMS)");
                 Ui.Option("0", "Tillbaka");
 
                 string choice = Ui.Choice();
@@ -190,6 +191,29 @@ namespace Bankapp
                                 break;
 
                             loggedInUser.Phone = newPhone;
+                            UserStore.Save(allUser);
+                            Ui.Success("Sparat!");
+                            Ui.Pause();
+                            break;
+                        }
+
+                    case "4":
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine($"  Nuvarande: {(loggedInUser.NotifyVia == NotificationChannel.Sms ? "SMS" : "E-post")}");
+                            Ui.Option("1", "E-post");
+                            Ui.Option("2", "SMS");
+                            Ui.Option("0", "Tillbaka");
+
+                            string notifyChoice = Ui.Choice();
+
+                            if (notifyChoice == "1")
+                                loggedInUser.NotifyVia = NotificationChannel.Email;
+                            else if (notifyChoice == "2")
+                                loggedInUser.NotifyVia = NotificationChannel.Sms;
+                            else
+                                break;
+
                             UserStore.Save(allUser);
                             Ui.Success("Sparat!");
                             Ui.Pause();
