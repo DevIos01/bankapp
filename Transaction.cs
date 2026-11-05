@@ -139,7 +139,7 @@ public static class TransactionService
         };
 
         source.AddTransaction(transaction);
-        destination.AddTransaction(transaction);
+        if (success) destination.AddTransaction(transaction);
 
         UserStore.Save(allUsers);
         return success;
