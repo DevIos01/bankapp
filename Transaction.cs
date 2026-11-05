@@ -89,4 +89,59 @@ public static class TransactionService
         UserStore.Save(allUsers);
         return success;
     }
+
+    public static Account? FindAccountByNumber(List<User> allUsers, long accountNumber)
+    {
+        foreach (User u in allUsers)
+        {
+            foreach (Account a in u.Accounts)
+            {
+                if (a.AccountNumber == accountNumber)
+                    return a;
+            }
+            
+        }
+        return null;
+    }
+    public static bool TransferToOther(
+    User user, List<User> allUsers,
+    Account source, Account destination, decimal amount)
+    {
+        decimal receivedAmount =
+            ExchangeRateManager.Convert(amount, source.Currency, destination.Currency);
+
+        bool success =
+            user.Accounts.Contains(source) &&
+            source != destination &&
+            amount > 0 &&
+            receivedAmount > 0 &&
+            source.Balance >= amount;
+
+        if (success)
+        {
+            source.Withdraw(amount);
+            destination.Deposit(receivedAmount);
+        }
+
+        Transaction transaction = new Transaction
+        {
+            Type = "Överföring",
+            From = $"{source.AccountName} ({source.AccountNumber})",
+            To = $"{destination.AccountName} ({destination.AccountNumber})",
+            FromAccountNumber = source.AccountNumber,
+            ToAccountNumber = destination.AccountNumber,
+            Amount = amount,
+            Exchange = source.Currency == destination.Currency
+                ? null
+                : $"{amount:N2} {source.Currency.ToString().ToUpper()} → " +
+                  $"{receivedAmount:N2} {destination.Currency.ToString().ToUpper()}",
+            Status = success ? "Genomförd" : "Misslyckad"
+        };
+
+        source.AddTransaction(transaction);
+        destination.AddTransaction(transaction);
+
+        UserStore.Save(allUsers);
+        return success;
+    }
 }
