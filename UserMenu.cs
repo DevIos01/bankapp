@@ -378,25 +378,26 @@ namespace Bankapp
             if (source is null)
                 return;
 
-            string input = Ui.Ask("  Mottagarens kontonummer (0 = avbryt): ");
-            if (input == "0")
-                return;
+            Account? destination = null;
 
-            if (!long.TryParse(input, out long accountNumber))
+            // ask again on a typo instead of going back to the menu
+            while (destination is null)
             {
-                Ui.Error("Ogiltigt kontonummer.");
-                Ui.Pause();
-                return;
-            }
+                string input = Ui.Ask("  Mottagarens kontonummer (0 = avbryt): ");
+                if (input == "0")
+                    return;
 
-            Account? destination =
-                TransactionService.FindAccountByNumber(allUsers, accountNumber);
+                if (!long.TryParse(input, out long accountNumber))
+                {
+                    Ui.Error("Ogiltigt kontonummer.");
+                    continue;
+                }
 
-            if (destination is null)
-            {
-                Ui.Error("Kontot finns inte.");
-                Ui.Pause();
-                return;
+                destination =
+                    TransactionService.FindAccountByNumber(allUsers, accountNumber);
+
+                if (destination is null)
+                    Ui.Error("Kontot finns inte.");
             }
 
             decimal? amount = AskAmount();
@@ -409,7 +410,7 @@ namespace Bankapp
 
             if (confirm.Trim().ToLower() != "j")
             {
-                Ui.Error("Överföringen avbröts.");
+                Console.WriteLine("  Överföringen avbröts.");
                 Ui.Pause();
                 return;
             }
