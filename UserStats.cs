@@ -26,16 +26,18 @@ namespace Bankapp
 
                 Ui.Header("STATISTIK");
 
-                // Antal transaktioner
-                Console.WriteLine($"  Antal transaktioner totalt: {all.Count}");
-                Console.WriteLine($"    Insättningar:  {all.Count(t => t.Type == "Insättning")}");
-                Console.WriteLine($"    Överföringar:  {transfers.Count}");
-                Console.WriteLine($"      Väntande:    {transfers.Count(t => t.Status == TransactionStatus.Pending)}");
-                Console.WriteLine($"      Genomförda:  {doneTransfers.Count}");
-                Console.WriteLine($"      Misslyckade: {transfers.Count(t => t.Status == TransactionStatus.Failed)}");
+                // Antal transaktioner, values lined up like MINA LÅN
+                Console.WriteLine("  Transaktioner:");
+                Console.WriteLine($"    Totalt:          {all.Count}");
+                Console.WriteLine($"    Insättningar:    {all.Count(t => t.Type == "Insättning")}");
+                Console.WriteLine($"    Lån:             {all.Count(t => t.Type == "Lån")}");
+                Console.WriteLine($"    Överföringar:    {transfers.Count}");
+                Console.WriteLine($"      Väntande:      {transfers.Count(t => t.Status == TransactionStatus.Pending)}");
+                Console.WriteLine($"      Genomförda:    {doneTransfers.Count}");
+                Console.WriteLine($"      Misslyckade:   {transfers.Count(t => t.Status == TransactionStatus.Failed)}");
 
                 Console.WriteLine();
-                Console.WriteLine("Totalt överförda belopp");
+                Console.WriteLine("  Totalt överfört:");
 
                 var totals = doneTransfers
                     .Select(t => new
@@ -49,14 +51,14 @@ namespace Bankapp
 
                 if (totals.Count == 0)
                 {
-                    Console.WriteLine("Inga genomförda överförningar ännu");
+                    Console.WriteLine("    Inga genomförda överföringar ännu.");
                 }
                 else
                 {
                     foreach (var group in totals)
                     {
                         Console.WriteLine(
-                       $"    {group.Sum(x => x.Amount),15:N2} {group.Key.ToString().ToUpper()} ({group.Count()} st)");
+                            $"    {group.Key.ToString().ToUpper() + ":",-17}{group.Sum(x => x.Amount):N2} ({group.Count()} st)");
                     }
                 }
                 Console.WriteLine();
@@ -84,7 +86,7 @@ namespace Bankapp
                     {
                         string owner = allUsers.FirstOrDefault(u => u.UserID == x.Account.UserID)?.Username ?? "okänd";
                         Console.WriteLine(
-                            $"    {rank++}. {x.Account.AccountName,-15} {x.Account.AccountNumber,-10} {owner,-12} {x.Count} transaktioner");
+                            $"    {rank++}. {x.Account.AccountName,-15} {x.Account.AccountNumber,-10} {owner,-12} {x.Count} st");
                     }
                 }
             }
