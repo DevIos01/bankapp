@@ -58,15 +58,13 @@ namespace Bankapp
                 switch (choice)
                 {
                     case "1":
-                        Console.WriteLine("  Kommer snart.");
-                        Ui.Pause();
+                        Loan.ShowLoans(loggedInUser);
                         break;
 
                     case "2":
-                        Console.WriteLine("  Kommer snart.");
-                        Ui.Pause();
-                        break;
-
+                        Loan.RequestLoan(loggedInUser, allUser, LoanRules.DefaultRate);
+                        break; 
+                        
                     case "0":
                         return;
 
@@ -88,7 +86,8 @@ namespace Bankapp
                 Ui.Option("3", "Skapa sparkonto");
                 Ui.Option("4", "Sätt in pengar");
                 Ui.Option("5", "Överför pengar");
-                Ui.Option("6", "Transaktionslogg");
+                Ui.Option("6", "Överför till annan kund");
+                Ui.Option("7", "Transaktionslogg");
                 Ui.Option("0", "Tillbaka");
 
                 string choice = Ui.Choice();
@@ -120,6 +119,10 @@ namespace Bankapp
                         break;
 
                     case "6":
+                        TransferToOtherMenu(loggedInUser, allUser);
+                        break;
+
+                    case "7":
                         TransactionLogMenu(loggedInUser);
                         break;
 
@@ -299,11 +302,11 @@ namespace Bankapp
                 if (input == "0")
                     return null;
 
-                if (int.TryParse(input, out int choice) &&
-                    choice >= 1 &&
-                    choice <= user.Accounts.Count)
+                if (int.TryParse(input, out int accountChoice) &&
+                    accountChoice >= 1 &&
+                    accountChoice <= user.Accounts.Count)
                 {
-                    return user.Accounts[choice - 1];
+                    return user.Accounts[accountChoice - 1];
                 }
 
                 Ui.Error(
@@ -385,7 +388,69 @@ namespace Bankapp
             }
             else
             {
-                Ui.Error("Överföringen misslyckades. Kontrollera belopp, saldo och valuta.");
+                Ui.Error("Överföringen misslyckades. Kontrollera belopp och saldo.");
+            }
+
+            Ui.Pause();
+        }
+
+        private static void TransferToOtherMenu(User user, List<User> allUsers)
+        {
+            Ui.Header("ÖVERFÖR TILL ANNAN KUND");
+
+            Account? source = ChooseAccount(user, "  Välj från-konto: ");
+            if (source is null)
+                return;
+
+            Account? destination = null;
+
+            // ask again on a typo instead of going back to the menu
+            while (destination is null)
+            {
+                string input = Ui.Ask("  Mottagarens kontonummer (0 = avbryt): ");
+                if (input == "0")
+                    return;
+
+                if (!long.TryParse(input, out long accountNumber))
+                {
+                    Ui.Error("Ogiltigt kontonummer.");
+                    continue;
+                }
+
+                destination =
+                    TransactionService.FindAccountByNumber(allUsers, accountNumber);
+
+                if (destination is null)
+                    Ui.Error("Kontot finns inte.");
+            }
+
+            decimal? amount = AskAmount();
+            if (amount is null)
+                return;
+
+            string confirm = Ui.Ask(
+                $"  Skicka {amount.Value:N2} {source.Currency.ToString().ToUpper()} " +
+                $"till {destination.AccountName} ({destination.AccountNumber})? (j/n): ");
+
+            if (confirm.Trim().ToLower() != "j")
+            {
+                Console.WriteLine("  Överföringen avbröts.");
+                Ui.Pause();
+                return;
+            }
+
+            bool success = TransactionService.TransferToOther(
+                user, allUsers, source, destination, amount.Value);
+
+            if (success)
+            {
+                Ui.Success(
+                    $"Överföringen på {amount.Value:N2} {source.Currency.ToString().ToUpper()} " +
+                    $"är registrerad och genomförs inom {TransactionService.WaitTime.TotalMinutes:0.#} min.");
+            }
+            else
+            {
+                Ui.Error("Överföringen misslyckades. Kontrollera belopp och saldo.");
             }
 
             Ui.Pause();
@@ -414,15 +479,53 @@ namespace Bankapp
             {
                 foreach (Transaction transaction in transactions)
                 {
+                    string amount = transaction.Exchange ??
+                        $"{transaction.Amount:N2} {account.Currency.ToString().ToUpper()}";
+
                     Console.WriteLine(
                         $"  {transaction.Timestamp.ToLocalTime():yyyy-MM-dd HH:mm:ss} | " +
                         $"{transaction.Type} | {transaction.From} → {transaction.To} | " +
-                        $"{transaction.Amount:N2} {account.Currency.ToString().ToUpper()} | " +
+                        $"{amount} | " +
                         $"{transaction.Status}");
                 }
             }
 
             Ui.Pause();
+        }
+
+        public static void TransferBetweenAccounts(User loggedInUser, List<User> allUser)
+        {
+            Console.WriteLine("Välj konto att överföra från:");
+            Account? fromAccount = loggedInUser.SelectAccount();
+            if (fromAccount is null)
+            {
+                return;
+            }
+            Console.WriteLine("Välj konto att överföra till:");
+            Account? toAccount = loggedInUser.SelectAccount();
+            if (toAccount is null)
+            {
+                return;
+            }
+            Console.Write("Ange belopp: ");
+            string? input = Console.ReadLine();
+            if (!decimal.TryParse(input, out decimal amount))
+            {
+                Ui.Error("Ogiltigt belopp.");
+                return;
+            }
+            
+            if (loggedInUser.TransferMoney(fromAccount, toAccount , amount))
+            {
+                Ui.Success("Överföringen lyckades.");
+                UserStore.Save(allUser);
+            }
+            else
+            {
+                Ui.Error("Överföringen misslyckades.");
+            }
+
+
         }
     }
 }

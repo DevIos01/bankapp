@@ -9,6 +9,7 @@ public class Account
     public long AccountNumber;
     public string AccountName = "";
     public CurrencyType Currency = CurrencyType.Sek;
+
     [JsonInclude]
     public decimal Balance { get; private set; }
     public Guid UserID;
@@ -153,3 +154,5 @@ public class Account
         return rnd.Next(999999999);
     }
 }
+
+   

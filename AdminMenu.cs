@@ -13,7 +13,8 @@ public static class AdminMenu
             Ui.Header("ADMIN");
             Ui.Option("1", "Skapa användare");
             Ui.Option("2", "Lås upp användare");
-            Ui.Option("3", "Statistik för användare");
+            Ui.Option("3", "Ändra växelkurser");
+            Ui.Option("4", "Statistik för användare");
             Ui.Option("0", "Logga ut");
             string choice = Ui.Choice();
 
@@ -28,6 +29,10 @@ public static class AdminMenu
                     break;
 
                 case "3":
+                    ChangeExchangeRates();
+                    break;
+
+                case "4":
                     UserStats.Show(allUsers);
                     break;
 
@@ -134,4 +139,56 @@ public static class AdminMenu
         Ui.Success($"{selectedUser.Username} har låsts upp.");
         Ui.Pause();
     } //unlock locked users
+
+    static void ChangeExchangeRates()
+    {
+        Ui.Header("VÄXELKURSER");
+        Console.WriteLine($"  1 USD = {ExchangeRateManager.UsdToSek:N2} SEK");
+        Console.WriteLine($"  1 EUR = {ExchangeRateManager.EurToSek:N2} SEK");
+        Console.WriteLine();
+
+        Ui.Option("1", "Ändra USD");
+        Ui.Option("2", "Ändra EUR");
+        Ui.Option("0", "Tillbaka");
+        Console.WriteLine();
+
+        int selection = Ui.AskNumber("  Val: ", 0, 2);
+
+        if (selection == 0)
+        {
+            return;
+        }
+
+        CurrencyType currency;
+
+        if (selection == 1)
+        {
+            currency = CurrencyType.Usd;
+        }
+        else
+        {
+            currency = CurrencyType.Eur;
+        }
+
+        while (true)
+        {
+            string input = Ui.Ask($"  Ny kurs, 1 {currency.ToString().ToUpper()} i SEK (0 = avbryt): ");
+
+            if (input == "0")
+            {
+                return;
+            }
+
+            if (decimal.TryParse(input, out decimal rate) &&
+                ExchangeRateManager.SetRate(currency, rate))
+            {
+                Console.WriteLine();
+                Ui.Success($"Ny kurs: 1 {currency.ToString().ToUpper()} = {rate:N2} SEK");
+                Ui.Pause();
+                return;
+            }
+
+            Ui.Error("Ange en kurs större än 0, eller 0 för att avbryta.");
+        }
+    } //change USD and EUR rates
 }
