@@ -328,6 +328,15 @@ namespace Bankapp
                 Ui.Success(
                     $"Insättningen på {amount.Value:N2} " +
                     $"{destination.Currency.ToString().ToUpper()} genomfördes.");
+
+                // savings accounts also show the interest, like when you open one
+                if (destination is SavingsAccount savings)
+                {
+                    Console.WriteLine(
+                        $"  Det ger {savings.YearlyInterest(amount.Value):N2} " +
+                        $"{destination.Currency.ToString().ToUpper()} i ränta per år " +
+                        $"({savings.InterestRate * 100m:0.#}%).");
+                }
             }
             else
             {
