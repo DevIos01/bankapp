@@ -36,8 +36,14 @@ namespace Bankapp
         }
         public static void Save(List<User> users)
         {
-            string json = JsonSerializer.Serialize(users, Options);
-            File.WriteAllText(FilePath, json);
+            // the transfer timer also saves, so one save at a time,
+            // and write a temp file first so users.json is never left half written
+            lock (TransactionService.Sync)
+            {
+                string json = JsonSerializer.Serialize(users, Options);
+                File.WriteAllText(FilePath + ".tmp", json);
+                File.Move(FilePath + ".tmp", FilePath, true);
+            }
         }
     }
 

@@ -14,6 +14,7 @@ public static class AdminMenu
             Ui.Option("1", "Skapa användare");
             Ui.Option("2", "Lås upp användare");
             Ui.Option("3", "Ändra växelkurser");
+            Ui.Option("4", "Statistik för användare");
             Ui.Option("0", "Logga ut");
             string choice = Ui.Choice();
 
@@ -29,6 +30,10 @@ public static class AdminMenu
 
                 case "3":
                     ChangeExchangeRates();
+                    break;
+
+                case "4":
+                    UserStats.Show(allUsers);
                     break;
 
                 case "0":

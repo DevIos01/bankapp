@@ -145,6 +145,7 @@ namespace Bankapp
                 Ui.Option("1", "Ändra namn");
                 Ui.Option("2", "Ändra e-post");
                 Ui.Option("3", "Ändra mobilnummer");
+                Ui.Option("4", "Ändra notifieringar (e-post/SMS)");
                 Ui.Option("0", "Tillbaka");
 
                 string choice = Ui.Choice();
@@ -193,6 +194,38 @@ namespace Bankapp
                                 break;
 
                             loggedInUser.Phone = newPhone;
+                            UserStore.Save(allUser);
+                            Ui.Success("Sparat!");
+                            Ui.Pause();
+                            break;
+                        }
+
+                    case "4":
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine($"  Nuvarande: {(loggedInUser.NotifyVia == NotificationChannel.Sms ? "SMS" : "E-post")}");
+                            Console.WriteLine();
+                            Ui.Option("1", "E-post");
+                            Ui.Option("2", "SMS");
+                            Ui.Option("0", "Tillbaka");
+
+                            string notifyChoice = Ui.Choice();
+
+                            if (notifyChoice == "1")
+                                loggedInUser.NotifyVia = NotificationChannel.Email;
+                            else if (notifyChoice == "2")
+                                loggedInUser.NotifyVia = NotificationChannel.Sms;
+                            else
+                            {
+                                // same as the other menus: 0 goes back, anything else is a wrong choice
+                                if (notifyChoice != "0")
+                                {
+                                    Ui.Error("Fel val, försök igen.");
+                                    Ui.Pause();
+                                }
+                                break;
+                            }
+
                             UserStore.Save(allUser);
                             Ui.Success("Sparat!");
                             Ui.Pause();
@@ -368,8 +401,8 @@ namespace Bankapp
             if (success)
             {
                 Ui.Success(
-                    $"Överföringen på {amount.Value:N2} " +
-                    $"{source.Currency.ToString().ToUpper()} genomfördes.");
+                    $"Överföringen på {amount.Value:N2} {source.Currency.ToString().ToUpper()} " +
+                    $"är registrerad och genomförs inom {TransactionService.WaitTime.TotalMinutes:0.#} min.");
             }
             else
             {
@@ -430,8 +463,8 @@ namespace Bankapp
             if (success)
             {
                 Ui.Success(
-                    $"Överföringen på {amount.Value:N2} " +
-                    $"{source.Currency.ToString().ToUpper()} genomfördes.");
+                    $"Överföringen på {amount.Value:N2} {source.Currency.ToString().ToUpper()} " +
+                    $"är registrerad och genomförs inom {TransactionService.WaitTime.TotalMinutes:0.#} min.");
             }
             else
             {

@@ -12,6 +12,7 @@ public class User
     public Guid UserID = Guid.NewGuid();
     public string Email = "";
     public string Phone = "";
+    public NotificationChannel NotifyVia = NotificationChannel.Email;
     public string Username = "";
     public string Password = "";
     public UserRole Role = UserRole.Customer; //default role 
