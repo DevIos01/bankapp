@@ -1,16 +1,44 @@
 # Bankapp
 
-A small C# console application that simulates basic banking workflows. The application supports customer registration and login, account management, transfers, currency conversion, administrator actions, and loan applications. It is intended as a learning project.
+A small C# console application that simulates basic banking workflows. The application supports customer registration and login, accounts in SEK, USD and EUR, savings accounts, deposits, transfers with currency conversion, pending transfers, loans, notifications for large transactions, and administrator tools for users, exchange rates and statistics. It is intended as a learning project.
 
 ## Development Plan
 
-The application can be understood as a sequence of feature areas:
+We worked in two sprints in Jira (project BANK). Tickets were built on their own branches and merged into `main` through pull requests with code review.
 
-1. Define the core banking objects: users, accounts, transactions, and loans.
-2. Add registration, KYC data collection, login, and separate customer and administrator menus.
-3. Implement account operations and transaction handling, including transfers and currency conversion.
-4. Add loan calculations and the loan application flow.
-5. Persist the user and account data as JSON and verify the main console workflows.
+### Sprint 1 (14 Oct – 27 Oct 2026)
+
+Goal: Register, log in, open accounts in SEK/USD/EUR, see balances and the transaction log.
+
+| Ticket | Task | Owner |
+| --- | --- | --- |
+| BANK-5 | Set up solution, folders and class skeleton | Shubham |
+| BANK-6 | Implement user registration and login with unique username and password | Tony |
+| BANK-7 | Lock users out after three failed login attempts | Tony |
+| BANK-8 | Allow customers to open new bank accounts | Alexander |
+| BANK-9 | Support accounts in SEK, USD or EUR | Alexander |
+| BANK-10 | Display list of customer's accounts and balances | Sima |
+| BANK-13 | Enable admins to create and unlock users | Tony |
+| BANK-16 | Add savings accounts with interest preview on deposit | Alexander |
+| BANK-21 | Allow users to update email and phone number | Tony |
+
+### Sprint 2 (27 Oct – 10 Nov 2026)
+
+Goal: Money moves: transfers, admin creates users, savings.
+
+| Ticket | Task | Owner |
+| --- | --- | --- |
+| BANK-11 | Add deposits and a transaction log per account | Tony |
+| BANK-12 | Design consistent menus, colors and ASCII-art logo | Shubham |
+| BANK-14 | Transfer money between own accounts | Sima |
+| BANK-15 | Transfer money to other customers' accounts | Sima |
+| BANK-17 | Convert cross-currency transfers using admin-managed exchange rates | Sima |
+| BANK-18 | Allow customers to take loans with interest preview | Tony |
+| BANK-19 | Limit total loans to 5x customer's bank holdings | Tony |
+| BANK-20 | Process pending transfers in 15-minute batches | Alexander |
+| BANK-22 | Show transaction statistics in admin menu | Alexander |
+| BANK-23 | Write notifications for large transactions | Alexander |
+| BANK-24 | Let admins set loan interest rate rules | Tony |
 
 ## Source Code Structure
 
@@ -27,13 +55,15 @@ The code is organized by responsibility in C# classes. The main menu classes han
 | `SavingsAccount` | Specialized account type that adds savings-interest information and calculations. |
 | `CurrencyType` | Enum for the currencies supported by accounts and currency conversion. |
 | `NotificationChannel` | Enum describing how a user prefers to receive notifications. |
+| `Notifications` | Sends a simulated e-mail or SMS (`NotificationChannel`) when a transfer over 10 000 is completed and logs it to `notifications.txt`. |
 | `Transaction` | Records transaction details such as type, source, destination, amount, timestamp, and status. |
+| `TransactionStatus` | Constants for a transfer's status: `Väntande` (pending), `Genomförd` (done), `Misslyckad` (failed). |
 | `TransactionService` | Coordinates deposits and transfers, including transfers between customers and the timed processing flow. |
-| `ExchangeRateManager` | Holds exchange rates and converts amounts between supported currencies. |
+| `ExchangeRateManager` | Holds the USD and EUR rates set by the administrator, saves them to `rates.txt`, and converts amounts between currencies. |
 | `Loan` | Represents a loan and handles loan applications, payout to an account, and displaying a user's loans and estimated costs. |
 | `LoanRules` | Contains loan policy calculations, including the maximum loan amount and annual interest-rate tiers. |
 | `UserStore` | Loads and saves the user list as JSON so that data remains available between application runs. |
-| `UserStats` | Calculates and displays user-related statistics for the administrator menu. |
+| `UserStats` | Shows transaction statistics for the administrator: counts by type and status, total transferred per currency, and the most used accounts. |
 | `Ui` | Shared console helpers for prompts, menus, input validation, status messages, and screen formatting. |
 
 ## Main Objects and Relationships
@@ -44,7 +74,9 @@ The code is organized by responsibility in C# classes. The main menu classes han
 - `UserMenu` and `AdminMenu` collect choices from the console and call the relevant classes and services.
 - `Loan` uses `LoanRules` to determine loan limits and interest rates.
 - `TransactionService` uses `ExchangeRateManager` when an operation involves different currencies.
-- `Program` uses `UserStore` at startup and during application operations to persist user data.
+- `TransactionService` calls `Notifications` when a completed transfer is over 10 000.
+- `AdminMenu` uses `ExchangeRateManager` to change rates and `UserStats` to show statistics.
+- `Program` loads the users with `UserStore` at startup; the menus, `TransactionService`, `Loan` and `User` call `UserStore.Save` after every change.
 
 ## UML
 
@@ -60,10 +92,16 @@ The code is organized by responsibility in C# classes. The main menu classes han
 
 ## Running the Application
 
-With the .NET SDK installed, open a terminal in the project directory and run:
+With the .NET 10 SDK installed, open a terminal in the project directory and run:
 
 ```bash
 dotnet run
 ```
 
-The application reads and writes `users.json` in its runtime application directory. This project is a console-based learning example and is not intended for handling real financial data.
+A default administrator account is created on first start: username `admin`, password `admin`.
+
+The application saves its data next to the executable: `users.json` (users and accounts), `rates.txt` (exchange rates) and `notifications.txt` (sent notifications).
+
+Transfers stay pending for 1 minute by default. Set the environment variable `TRANSFER_WAIT_TIME` (in minutes) to change it, e.g. `0,1` on a Swedish system.
+
+This project is a console-based learning example and is not intended for handling real financial data.
