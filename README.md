@@ -46,6 +46,10 @@ The code is organized by responsibility in C# classes. The main menu classes han
 - `TransactionService` uses `ExchangeRateManager` when an operation involves different currencies.
 - `Program` uses `UserStore` at startup and during application operations to persist user data.
 
+## UML
+
+![UML diagram](uml.png)
+
 ## Typical Application Flow
 
 1. `Program` loads users from `UserStore` and shows the start menu.
